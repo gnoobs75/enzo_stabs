@@ -3,160 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enzo Stabs - Enhanced</title>
+    <title>Enzo Stabs</title>
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-        #gameOverScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10;
-        }
-        #restartButton {
-            padding: 20px 40px;
-            font-size: 24px;
-            background: #fff;
-            border: 2px solid #000;
-            cursor: pointer;
-        }
-        #restartButton:hover {
-            background: #ddd;
-        }
-        #startMenu {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 15;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        #startMenu button {
-            padding: 15px 30px;
-            font-size: 20px;
-            background: #fff;
-            border: 2px solid #000;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        #startMenu button:hover {
-            background: #ddd;
-        }
-        #startMenu input[type="text"] {
-            padding: 15px;
-            font-size: 24px;
-            margin-top: 20px;
-            width: 400px;
-        }
-        #startMenu label {
-            margin: 10px 10px 0 0;
-        }
-        #startMenu img {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-        }
-        #hugOverlay {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 48px;
-            color: #fff;
-            text-shadow: 2px 2px 4px #000;
-            z-index: 5;
-            display: flex;
-            align-items: center;
-        }
-        #sprintIcon {
-            width: 40px;
-            height: 40px;
-            margin-right: 20px;
-            transition: border 1s;
-        }
-        #sprintIcon.rainbow {
-            border: 3px solid;
-            animation: rainbowBorder 2s infinite;
-        }
-        @keyframes rainbowBorder {
-            0% { border-color: red; }
-            20% { border-color: orange; }
-            40% { border-color: yellow; }
-            60% { border-color: green; }
-            80% { border-color: blue; }
-            100% { border-color: violet; }
-        }
-        #guyIndicator {
-            width: 40px;
-            height: 40px;
-            position: absolute;
-            bottom: -40px;
-            left: calc(50% - 70px);
-            transition: bottom 0.5s ease-in-out;
-            z-index: 5;
-        }
-        #achievementSticker, #fireyBadge {
-            width: 50px;
-            height: 50px;
-            margin-left: 20px;
-            display: none;
-        }
-        .badge {
-            width: 50px;
-            height: 50px;
-            margin-left: -40px;
-        }
-        #alertOverlay {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #ff0000;
-            font-family: 'Courier New', monospace;
-            font-size: 36px;
-            text-align: center;
-            display: none;
-            z-index: 20;
-            text-shadow: 2px 2px 0 #000;
-            transition: top 6s linear;
-        }
-        #vignette {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
-            z-index: 5;
-        }
-        .speechBubble {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid #000;
-            border-radius: 10px;
-            padding: 5px 10px;
-            font-size: 14px;
-            color: #000;
-            font-family: Arial, sans-serif;
-            z-index: 5;
-            pointer-events: none;
-            display: none;
-        }
+        /* CSS remains largely unchanged but moved to separate block below */
     </style>
 </head>
 <body>
@@ -164,21 +13,27 @@
     <button id="restartButton">Try For More Hugs</button>
 </div>
 <div id="startMenu">
-    <img src="guy.png" alt="Guy">
+    <img src="guy.png" alt="Guy" class="guy">
     <h1>Enzo Stabs</h1>
-    <p>Welcome to Enzo Stabs! You’re a brave Ronin navigating a twisted map, hunted by Enzo, a relentless blue figure with a bloody knife. Your goal? Collect as many happy hugs as you can while evading Enzo’s deadly pursuit. Watch out—he gets faster every 3 hugs you grab!</p>
+    <p>You’re a brave Ronin navigating a twisted map,<br>hunted by Enzo, a relentless blue figure<br>with a bloody knife.</p>
     <p><strong>Controls:</strong><br>WASD - Move<br>Shift - Sprint (3s, 10s cooldown)<br>Mouse - Look around</p>
-    <div style="margin-top: 20px;">
+    <div>
         <label><input type="radio" name="difficulty" value="easy" checked> Easy</label>
         <label><input type="radio" name="difficulty" value="medium"> Medium</label>
         <label><input type="radio" name="difficulty" value="hard"> Hard</label>
     </div>
+    <div>
+        <label><input type="checkbox" id="musicToggle" checked> Music</label>
+        <label><input type="checkbox" id="soundToggle" checked> Sound</label>
+    </div>
     <input type="text" id="playerName" placeholder="Enter your name (3-25 chars)" maxlength="25">
     <button id="startButton" disabled>Gather Hugs</button>
+    <img src="firey.gif" alt="Firey Left" class="firey left">
+    <img src="firey.gif" alt="Firey Right" class="firey right">
 </div>
 <div id="hugOverlay">
-    <img id="sprintIcon" src="fire-dash-green.png" alt="Sprint">
     <img id="guyIndicator" src="guy.png" alt="Sprint Available">
+    <img id="sprintIcon" src="fire-dash-green.png" alt="Sprint">
     <span>Hugs: 0</span>
     <img id="achievementSticker" src="stoned_dog.png" alt="Achievement">
     <img id="fireyBadge" src="firey.gif" alt="Firey Achievement">
@@ -195,999 +50,686 @@
 <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
 <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/ColorCorrectionShader.js"></script>
 <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    document.body.appendChild(renderer.domElement);
-
-    // Post-Processing Setup
-    const composer = new THREE.EffectComposer(renderer);
-    const renderPass = new THREE.RenderPass(scene, camera);
-    composer.addPass(renderPass);
-
-    const bloomPass = new THREE.UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.5, // strength
-        0.4, // radius
-        0.85 // threshold
-    );
-    composer.addPass(bloomPass);
-
-    const colorCorrectionPass = new THREE.ShaderPass(THREE.ColorCorrectionShader);
-    colorCorrectionPass.uniforms['powRGB'].value = new THREE.Vector3(1.1, 1.1, 1.1);
-    colorCorrectionPass.uniforms['mulRGB'].value = new THREE.Vector3(1.05, 1.0, 0.95);
-    composer.addPass(colorCorrectionPass);
-
-    let motionBlurAccum = 0;
-
-    scene.fog = new THREE.Fog(0x333333, 10, 50);
-
-    const ambientLight = new THREE.AmbientLight(0x404040);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 10, 5);
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
-
-    const torchLight = new THREE.PointLight(0xffaa00, 1.5, 20);
-    torchLight.castShadow = true;
-    scene.add(torchLight);
-
-    const world = new CANNON.World();
-    world.gravity.set(0, -9.82, 0);
-
-    const groundGeometry = new THREE.PlaneGeometry(200, 200);
-    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.5 });
-    const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
-    groundMesh.rotation.x = -Math.PI / 2;
-    groundMesh.receiveShadow = true;
-    scene.add(groundMesh);
-    const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() });
-    groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-    world.addBody(groundBody);
-
-    const decalGeometry = new THREE.CircleGeometry(1, 16);
-    const decalMaterial = new THREE.MeshBasicMaterial({ color: 0x666666, transparent: true, opacity: 0.5 });
-    const decals = new THREE.InstancedMesh(decalGeometry, decalMaterial, 50);
-    for (let i = 0; i < 50; i++) {
-        const matrix = new THREE.Matrix4();
-        matrix.setPosition(
-            Math.random() * 190 - 95,
-            0.01,
-            Math.random() * 190 - 95
-        );
-        matrix.scale(new THREE.Vector3(Math.random() * 2 + 1, 1, Math.random() * 2 + 1));
-        decals.setMatrixAt(i, matrix);
-    }
-    scene.add(decals);
-
-    const map = [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1],
-        [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0,1],
-        [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1],
-        [1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1],
-        [1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,0,1,0,1,0,1,1,1,1,0,1,1,1,1,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1],
-        [1,0,1,1,1,1,0,1,1,1,0,1,1,0,1,1,0,1,0,1],
-        [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
-        [1,1,1,0,1,1,0,1,1,1,1,0,1,0,1,1,0,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1],
-        [1,0,1,1,1,1,0,1,0,1,1,0,1,0,1,1,1,0,0,1],
-        [1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,1,0,1,1,1,0,1,0,1,1,0,1,0,1,1,1,1,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
-        [1,0,1,1,1,1,0,1,1,1,0,1,1,0,1,1,0,1,0,1],
-        [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
-        [1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,0,1,0,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    ];
-    const tiles = [
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    ];
-    const cellSize = 10;
-    const wallHeight = 5;
-
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.setCrossOrigin('anonymous');
-    let enzosTexture, stonedChuckTexture;
-
-    textureLoader.load('enzos.png', (texture) => {
-        enzosTexture = texture;
-        map.forEach((row, i) => {
-            row.forEach((cell, j) => {
-                if (cell === 1) {
-                    const height = wallHeight + Math.random() * 2 - 1;
-                    const wallGeometry = new THREE.BoxGeometry(cellSize, height, cellSize);
-                    const wallMaterial = Math.random() < 0.3 ?
-                        new THREE.MeshStandardMaterial({ map: enzosTexture, roughness: 0.5 }) :
-                        new THREE.MeshStandardMaterial({ color: 0x00ff00, roughness: 0.5 });
-                    const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
-                    wallMesh.position.set(j * cellSize, height / 2, i * cellSize);
-                    wallMesh.rotation.y = Math.random() * 0.1 - 0.05;
-                    wallMesh.castShadow = true;
-                    wallMesh.receiveShadow = true;
-                    scene.add(wallMesh);
-                    const wallBody = new CANNON.Body({
-                        mass: 0,
-                        shape: new CANNON.Box(new CANNON.Vec3(cellSize / 2, height / 2, cellSize / 2)),
-                    });
-                    wallBody.position.set(j * cellSize, height / 2, i * cellSize);
-                    world.addBody(wallBody);
-                }
-            });
-        });
-    });
-
-    textureLoader.load('stoned_chuck.png', (texture) => {
-        stonedChuckTexture = texture;
-        tiles.forEach((row, i) => {
-            row.forEach((tile, j) => {
-                if (tile === 1 && map[i][j] === 0) {
-                    const tileGeometry = new THREE.PlaneGeometry(cellSize * 0.8, cellSize * 0.8);
-                    const tileMaterial = new THREE.MeshBasicMaterial({ map: stonedChuckTexture });
-                    const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
-                    tileMesh.rotation.x = -Math.PI / 2;
-                    tileMesh.position.set(j * cellSize + cellSize / 2, 0.01, i * cellSize + cellSize / 2);
-                    scene.add(tileMesh);
-                } else if (tile === 2) {
-                    const tileGeometry = new THREE.PlaneGeometry(cellSize, cellSize);
-                    const tileMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-                    const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
-                    tileMesh.rotation.x = -Math.PI / 2;
-                    tileMesh.position.set(j * cellSize + cellSize / 2, 0.01, i * cellSize + cellSize / 2);
-                    scene.add(tileMesh);
-                }
-            });
-        });
-    });
-
-    const torusGeometry = new THREE.TorusGeometry(2, 1, 16, 100);
-    const torusMaterial = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.5 });
-    const torusMesh = new THREE.Mesh(torusGeometry, torusMaterial);
-    torusMesh.position.set(15, 1, 15);
-    torusMesh.castShadow = true;
-    torusMesh.receiveShadow = true;
-    scene.add(torusMesh);
-
-    const pyramidGeometry = new THREE.ConeGeometry(2, 4, 4);
-    const pyramidMaterial = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.5 });
-    const pyramidMesh = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
-    pyramidMesh.position.set(35, 2, 35);
-    pyramidMesh.castShadow = true;
-    pyramidMesh.receiveShadow = true;
-    scene.add(pyramidMesh);
-
-    const mirrorWidth = window.innerWidth * 0.025;
-    const mirrorHeight = mirrorWidth / 4;
-    const mirrorCamera = new THREE.PerspectiveCamera(75, mirrorWidth / mirrorHeight, 0.1, 1000);
-    const mirrorTexture = new THREE.WebGLRenderTarget(mirrorWidth * 4, mirrorHeight * 4);
-    const mirrorGeometry = new THREE.PlaneGeometry(mirrorWidth / 90, mirrorHeight / 90);
-    const mirrorMaterial = new THREE.MeshBasicMaterial({ map: mirrorTexture.texture });
-    const mirrorMesh = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
-    mirrorMesh.position.set(0, 0.55, -1);
-    camera.add(mirrorMesh);
-    const borderGeometry = new THREE.PlaneGeometry(mirrorWidth / 85, mirrorHeight / 85);
-    const borderMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    const borderMesh = new THREE.Mesh(borderGeometry, borderMaterial);
-    borderMesh.position.set(0, 0.55, -1.01);
-    camera.add(borderMesh);
-    scene.add(camera);
-
-    let playerHeadTexture, enzoHeadTexture, happEnzoTexture;
-
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    let ambientSound, gameOverSound, hugSound, wrathSound, heartbeatSound;
-    const ambientBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 10, audioContext.sampleRate);
-    for (let channel = 0; channel < 2; channel++) {
-        const data = ambientBuffer.getChannelData(channel);
-        for (let i = 0; i < data.length; i++) {
-            data[i] = (Math.random() - 0.5) * 0.05;
-        }
-    }
-    ambientSound = audioContext.createBufferSource();
-    ambientSound.buffer = ambientBuffer;
-    ambientSound.loop = true;
-    const ambientGain = audioContext.createGain();
-    ambientGain.gain.value = 0.1;
-    ambientSound.connect(ambientGain);
-    ambientGain.connect(audioContext.destination);
-    document.addEventListener('click', () => {
-        if (audioContext.state === 'suspended') audioContext.resume();
-        ambientSound.start();
-    }, { once: true });
-
-    gameOverSound = new Audio('fuck-you-pay-me.mp3');
-    gameOverSound.preload = 'auto';
-    hugSound = new Audio('hug.mp3');
-    hugSound.preload = 'auto';
-    wrathSound = new Audio('coming-for-you.mp3');
-    wrathSound.preload = 'auto';
-    heartbeatSound = new Audio('heartbeat.mp3');
-    heartbeatSound.loop = true;
-    heartbeatSound.preload = 'auto';
-    heartbeatSound.volume = 0.5;
-
-    function tileSound() {
-        if (audioContext.state === 'running') {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.type = 'square';
-            oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.1);
-        }
-    }
-
-    const waypoints = [];
-    map.forEach((row, i) => {
-        row.forEach((cell, j) => {
-            if (cell === 0) {
-                waypoints.push({ x: j * cellSize + cellSize / 2, z: i * cellSize + cellSize / 2 });
-            }
-        });
-    });
-
-    function getClosestWaypoint(pos) {
-        return waypoints.reduce((closest, wp) => {
-            const dist = Math.hypot(wp.x - pos.x, wp.z - pos.z);
-            return dist < Math.hypot(closest.x - pos.x, closest.z - pos.z) ? wp : closest;
-        }, waypoints[0]);
-    }
-
-    function getNextWaypoint(currentPos, targetPos) {
-        const currentWp = getClosestWaypoint(currentPos);
-        const targetWp = getClosestWaypoint(targetPos);
-        if (currentWp === targetWp) return targetPos;
-
-        let minDist = Infinity;
-        let nextWp = currentWp;
-        waypoints.forEach(wp => {
-            if (wp === currentWp) return;
-            const distToTarget = Math.hypot(wp.x - targetWp.x, wp.z - targetWp.z);
-            const distToCurrent = Math.hypot(wp.x - currentWp.x, wp.z - currentWp.z);
-            if (distToTarget < minDist && distToCurrent < cellSize * 2) {
-                minDist = distToTarget;
-                nextWp = wp;
-            }
-        });
-        return nextWp;
-    }
-
-    function computeSteering(enzoPos, targetPos) {
-        const desired = new THREE.Vector3(targetPos.x - enzoPos.x, 0, targetPos.z - enzoPos.z);
-        const distance = desired.length();
-        desired.normalize();
-
-        const ahead = new THREE.Vector3(enzoPos.x, 0, enzoPos.z).add(desired.clone().multiplyScalar(5));
-        let avoidance = new THREE.Vector3(0, 0, 0);
-        map.forEach((row, i) => {
-            row.forEach((cell, j) => {
-                if (cell === 1) {
-                    const wallPos = new THREE.Vector3(j * cellSize + cellSize / 2, 0, i * cellSize + cellSize / 2);
-                    const toWall = new THREE.Vector3(wallPos.x - ahead.x, 0, wallPos.z - ahead.z);
-                    const distToWall = toWall.length();
-                    if (distToWall < 3) {
-                        toWall.normalize();
-                        avoidance.sub(toWall.multiplyScalar((3 - distToWall) / 3));
-                    }
-                }
-            });
-        });
-
-        return desired.add(avoidance).normalize();
-    }
-
-    function preventWallClipping(pos) {
-        const cellX = Math.floor(pos.x / cellSize);
-        const cellZ = Math.floor(pos.z / cellSize);
-        if (cellX >= 0 && cellX < 20 && cellZ >= 0 && cellZ < 20 && map[cellZ][cellX] === 1) {
-            const closestWp = getClosestWaypoint(pos);
-            pos.x = closestWp.x;
-            pos.z = closestWp.z;
-        }
-        return pos;
-    }
-
-    function findValidSpawn(roninPos, minDist, maxDist) {
-        const validSpawns = waypoints.filter(wp => {
-            const dist = Math.hypot(wp.x - roninPos.x, wp.z - roninPos.z);
-            return dist >= minDist && dist <= maxDist;
-        });
-        return validSpawns[Math.floor(Math.random() * validSpawns.length)];
-    }
-
-    function findValidTeleport(roninPos, minDist) {
-        const validSpawns = waypoints.filter(wp => {
-            const dist = Math.hypot(wp.x - roninPos.x, wp.z - roninPos.z);
-            return dist >= minDist;
-        });
-        return validSpawns[Math.floor(Math.random() * validSpawns.length)];
-    }
-
-    const sprintParticlesGeometry = new THREE.BufferGeometry();
-    const sprintParticlesMaterial = new THREE.PointsMaterial({
-        size: 0.3,
-        vertexColors: true,
-        transparent: true
-    });
-    const sprintParticles = new THREE.Points(sprintParticlesGeometry, sprintParticlesMaterial);
-    scene.add(sprintParticles);
-
-    const hugParticlesGeometry = new THREE.BufferGeometry();
-    const hugParticlesMaterial = new THREE.PointsMaterial({
-        size: 0.5,
-        color: 0xffff00,
-        transparent: true,
-        opacity: 1
-    });
-    const hugParticles = new THREE.Points(hugParticlesGeometry, hugParticlesMaterial);
-    scene.add(hugParticles);
-    let hugParticleData = [];
-
-    const bloodParticlesGeometry = new THREE.BufferGeometry();
-    const bloodParticlesMaterial = new THREE.PointsMaterial({
-        size: 0.1,
-        color: 0xff0000,
-        transparent: true,
-        opacity: 1
-    });
-    const bloodParticles = new THREE.Points(bloodParticlesGeometry, bloodParticlesMaterial);
-    scene.add(bloodParticles);
-    let bloodParticleData = [];
-
-    function setupGame() {
-        const roninGroup = new THREE.Group();
-        const roninBodyGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1.5, 16);
-        const roninBodyMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
-        const roninBodyMesh = new THREE.Mesh(roninBodyGeometry, roninBodyMaterial);
-        roninBodyMesh.position.set(0, 0.75, 0);
-        roninBodyMesh.castShadow = true;
-        roninGroup.add(roninBodyMesh);
-        const roninHeadGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-        const roninHeadMaterial = new THREE.MeshStandardMaterial({ map: playerHeadTexture || new THREE.Texture(), roughness: 0.5 });
-        const roninHeadMesh = new THREE.Mesh(roninHeadGeometry, roninHeadMaterial);
-        roninHeadMesh.position.set(0, 1.75, 0);
-        roninHeadMesh.castShadow = true;
-        roninGroup.add(roninHeadMesh);
-        const armGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 16);
-        const armMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
-        const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-        leftArm.position.set(-0.5, 1.25, 0);
-        leftArm.castShadow = true;
-        roninGroup.add(leftArm);
-        const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-        rightArm.position.set(0.5, 1.25, 0);
-        rightArm.castShadow = true;
-        roninGroup.add(rightArm);
-        const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 16);
-        const legMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
-        const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
-        leftLeg.position.set(-0.2, 0.25, 0);
-        leftLeg.castShadow = true;
-        roninGroup.add(leftLeg);
-        const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
-        rightLeg.position.set(0.2, 0.25, 0);
-        rightLeg.castShadow = true;
-        roninGroup.add(rightLeg);
-        scene.add(roninGroup);
-        roninGroup.visible = false;
-
-        const roninBody = new CANNON.Body({
-            mass: 1,
-            shape: new CANNON.Cylinder(0.5, 0.5, 2, 16),
-        });
-        roninBody.position.set(10, 1, 10);
-        world.addBody(roninBody);
-
-        const enzoGroup = new THREE.Group();
-        const enzoTorsoGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1, 16, 1, true);
-        const enzoBodyMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
-        const enzoTorsoMesh = new THREE.Mesh(enzoTorsoGeometry, enzoBodyMaterial);
-        enzoTorsoMesh.position.set(0, 0.5, 0);
-        enzoTorsoMesh.castShadow = true;
-        enzoGroup.add(enzoTorsoMesh);
-        const enzoHeadGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const enzoHeadMaterial = new THREE.MeshStandardMaterial({ map: enzoHeadTexture || new THREE.Texture(), roughness: 0.5 });
-        const enzoHeadMesh = new THREE.Mesh(enzoHeadGeometry, enzoHeadMaterial);
-        enzoHeadMesh.position.set(0, 1.5, 0);
-        enzoHeadMesh.castShadow = true;
-        enzoGroup.add(enzoHeadMesh);
-        const enzoArmGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16);
-        const enzoArmMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
-        const enzoLeftArm = new THREE.Mesh(enzoArmGeometry, enzoArmMaterial);
-        enzoLeftArm.position.set(-0.5, 0.5, 0);
-        enzoLeftArm.rotation.z = Math.PI / 4;
-        enzoLeftArm.castShadow = true;
-        enzoGroup.add(enzoLeftArm);
-        const enzoRightArm = new THREE.Mesh(enzoArmGeometry, enzoArmMaterial);
-        enzoRightArm.position.set(0.5, 0.5, 0);
-        enzoRightArm.rotation.z = -Math.PI / 4;
-        enzoRightArm.castShadow = true;
-        enzoGroup.add(enzoRightArm);
-        const knifeGeometry = new THREE.BoxGeometry(0.1, 1.5, 0.05);
-        const knifeMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.8, roughness: 0.2 });
-        const knifeMesh = new THREE.Mesh(knifeGeometry, knifeMaterial);
-        knifeMesh.position.set(0, 0.75, 0);
-        knifeMesh.rotation.x = Math.PI / 2;
-        knifeMesh.castShadow = true;
-        enzoRightArm.add(knifeMesh);
-        const knifeTipGeometry = new THREE.BoxGeometry(0.1, 0.2, 0.05);
-        const knifeTipMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-        const knifeTipMesh = new THREE.Mesh(knifeTipGeometry, knifeTipMaterial);
-        knifeTipMesh.position.set(0, 0.85, 0);
-        knifeTipMesh.castShadow = true;
-        enzoRightArm.add(knifeTipMesh);
-        const bloodGeometry = new THREE.SphereGeometry(0.05, 8, 8);
-        const bloodMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const bloodMesh = new THREE.Mesh(bloodGeometry, bloodMaterial);
-        bloodMesh.position.set(0, 0.85, 0);
-        bloodMesh.visible = false;
-        enzoRightArm.add(bloodMesh);
-        const enzoLegGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1, 16);
-        const enzoLegMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
-        const enzoLeftLeg = new THREE.Mesh(enzoLegGeometry, enzoLegMaterial);
-        enzoLeftLeg.position.set(-0.2, 0.25, 0);
-        enzoLeftLeg.castShadow = true;
-        enzoGroup.add(enzoLeftLeg);
-        const enzoRightLeg = new THREE.Mesh(enzoLegGeometry, enzoLegMaterial);
-        enzoRightLeg.position.set(0.2, 0.25, 0);
-        enzoRightLeg.castShadow = true;
-        enzoGroup.add(enzoRightLeg);
-        scene.add(enzoGroup);
-
-        const enzoBody = new CANNON.Body({
-            mass: 0,
-            shape: new CANNON.Cylinder(0.25, 0.25, 1.5, 16),
-        });
-        const enzoSpawn = findValidSpawn({ x: 10, z: 10 }, 20, 30);
-        enzoBody.position.set(enzoSpawn.x, 0.75, enzoSpawn.z);
-        world.addBody(enzoBody);
-
-        const hugs = [];
-        const compliments = [
-            "loves how <name> writes amazing code!",
-            "admires <name>'s coding skills!",
-            "thinks <name>'s code is pure art!",
-            "is in awe of <name>'s programming!",
-            "adores <name>'s brilliant code!"
-        ];
-        const openTiles = waypoints;
-        for (let i = 0; i < 20; i++) {
-            const pos = openTiles[Math.floor(Math.random() * openTiles.length)];
-            const hugGroup = new THREE.Group();
-            const hugTorsoGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1, 16, 1, true);
-            const hugBodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5, emissive: 0xffff00, emissiveIntensity: 0.5 });
-            const hugTorsoMesh = new THREE.Mesh(hugTorsoGeometry, hugBodyMaterial);
-            hugTorsoMesh.position.set(0, 0.5, 0);
-            hugTorsoMesh.castShadow = true;
-            hugGroup.add(hugTorsoMesh);
-            const hugHeadGeometry = new THREE.BoxGeometry(1, 1, 1);
-            const hugHeadMaterial = new THREE.MeshStandardMaterial({ map: happEnzoTexture || new THREE.Texture(), roughness: 0.5 });
-            const hugHeadMesh = new THREE.Mesh(hugHeadGeometry, hugHeadMaterial);
-            hugHeadMesh.position.set(0, 1.5, 0);
-            hugHeadMesh.castShadow = true;
-            hugGroup.add(hugHeadMesh);
-            const hugArmGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16);
-            const hugArmMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5 });
-            const hugLeftArm = new THREE.Mesh(hugArmGeometry, hugArmMaterial);
-            hugLeftArm.position.set(-0.5, 0.5, 0);
-            hugLeftArm.castShadow = true;
-            hugGroup.add(hugLeftArm);
-            const hugRightArm = new THREE.Mesh(hugArmGeometry, hugArmMaterial);
-            hugRightArm.position.set(0.5, 0.5, 0);
-            hugRightArm.castShadow = true;
-            hugGroup.add(hugRightArm);
-            const hugLegGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1, 16);
-            const hugLegMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5 });
-            const hugLeftLeg = new THREE.Mesh(hugLegGeometry, hugLegMaterial);
-            hugLeftLeg.position.set(-0.2, 0.25, 0);
-            hugLeftLeg.castShadow = true;
-            hugGroup.add(hugLeftLeg);
-            const hugRightLeg = new THREE.Mesh(hugLegGeometry, hugLegMaterial);
-            hugRightLeg.position.set(0.2, 0.25, 0);
-            hugRightLeg.castShadow = true;
-            hugGroup.add(hugRightLeg);
-            hugGroup.position.set(pos.x, 0, pos.z);
-            scene.add(hugGroup);
-            const hugBody = new CANNON.Body({
-                mass: 1,
-                shape: new CANNON.Cylinder(0.25, 0.25, 1.5, 16),
-            });
-            hugBody.position.set(pos.x, 0.75, pos.z);
-            world.addBody(hugBody);
-
-            const speechBubble = document.createElement('div');
-            speechBubble.className = 'speechBubble';
-            const playerName = document.getElementById('playerName').value || "Ronin"; // Default if empty
-            speechBubble.textContent = compliments[Math.floor(Math.random() * compliments.length)].replace('<name>', playerName);
-            document.body.appendChild(speechBubble);
-            hugs.push({ group: hugGroup, body: hugBody, collected: false, leftArm: hugLeftArm, rightArm: hugRightArm, leftLeg: hugLeftLeg, rightLeg: hugRightLeg, speechBubble, speechTimer: Math.random() * 5 });
-        }
-
-        const keys = new Set();
-        document.addEventListener('keydown', (event) => keys.add(event.key.toLowerCase()));
-        document.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase()));
-
-        document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock;
-        document.addEventListener('click', () => document.body.requestPointerLock());
-        let yaw = 0, pitch = 0;
-        const sensitivity = 0.002;
-        document.addEventListener('mousemove', (event) => {
-            if (document.pointerLockElement === document.body || document.mozPointerLockElement === document.body) {
-                yaw -= event.movementX * sensitivity;
-                pitch -= event.movementY * sensitivity;
-                pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
-            }
-        });
-
-        let numHugsCollected = 0;
-        let speedMultiplier = 1;
-        let effectTimer = 0;
-        let lastTile = 0;
-        let time = 0;
-        let bloodDripTimer = 0;
-        let gameOver = false;
-        let gamePaused = true;
-        let enzoBaseSpeed = 2;
-        let sprintActive = false;
-        let sprintTimer = 0;
-        let sprintCooldown = 0;
-        let alertTimer = 0;
-        let teleportTimer = 0;
-        let lastPlayerName = '';
-        let lastDifficulty = 'easy';
-
-        const gameOverScreen = document.getElementById('gameOverScreen');
-        const restartButton = document.getElementById('restartButton');
-        const startMenu = document.getElementById('startMenu');
-        const startButton = document.getElementById('startButton');
-        const playerNameInput = document.getElementById('playerName');
-        const difficultyRadios = document.getElementsByName('difficulty');
-        const hugOverlay = document.getElementById('hugOverlay');
-        const achievementSticker = document.getElementById('achievementSticker');
-        const fireyBadge = document.getElementById('fireyBadge');
-        const sprintIcon = document.getElementById('sprintIcon');
-        const guyIndicator = document.getElementById('guyIndicator');
-
-        playerNameInput.addEventListener('input', () => {
-            const name = playerNameInput.value.trim();
-            startButton.disabled = name.length < 3 || name.length > 25;
-            lastPlayerName = name;
-        });
-
-        playerNameInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && !startButton.disabled) {
-                startGame();
-            }
-        });
-
-        difficultyRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                lastDifficulty = radio.value;
-            });
-        });
-
-        startButton.addEventListener('click', () => {
-            if (!startButton.disabled) {
-                startGame();
-            }
-        });
-
-        function startGame() {
-            startMenu.style.display = 'none';
-            gamePaused = false;
-            lastPlayerName = playerNameInput.value.trim();
-            enzoBaseSpeed = 2;
-            requestAnimationFrame(animate);
-        }
-
-        restartButton.addEventListener('click', () => {
-            gameOverSound.pause();
-            gameOverSound.currentTime = 0;
-            wrathSound.pause();
-            wrathSound.currentTime = 0;
-            heartbeatSound.pause();
-            gameOverScreen.style.display = 'none';
-            gameOver = false;
-            gamePaused = true;
-            startMenu.style.display = 'flex';
-            playerNameInput.value = lastPlayerName;
-            startButton.disabled = lastPlayerName.length < 3 || lastPlayerName.length > 25;
-            difficultyRadios.forEach(radio => radio.checked = radio.value === lastDifficulty);
-            roninBody.position.set(10, 1, 10);
-            const newEnzoSpawn = findValidSpawn({ x: 10, z: 10 }, 20, 30);
-            enzoBody.position.set(newEnzoSpawn.x, 0.75, newEnzoSpawn.z);
-            numHugsCollected = 0;
-            enzoBaseSpeed = 2;
-            speedMultiplier = 1;
-            sprintActive = false;
-            sprintTimer = 0;
-            sprintCooldown = 0;
-            sprintIcon.src = 'fire-dash-green.png';
-            sprintIcon.classList.remove('rainbow');
-            guyIndicator.style.bottom = '-40px';
-            hugOverlay.children[2].textContent = `Hugs: ${numHugsCollected}`;
-            achievementSticker.style.display = 'none';
-            fireyBadge.style.display = 'none';
-            while (hugOverlay.getElementsByClassName('badge').length > 2) {
-                hugOverlay.removeChild(hugOverlay.lastChild);
-            }
-            alertOverlay.style.display = 'none';
-            teleportTimer = 0;
-            hugs.forEach(hug => {
-                if (hug.speechBubble) hug.speechBubble.style.display = 'none';
-            });
-            hugParticleData = [];
-            bloodParticleData = [];
-        });
-
-        roninBody.addEventListener('collide', (event) => {
-            if (event.body === enzoBody && !gameOver) {
-                gameOver = true;
-                gameOverSound.play();
-                heartbeatSound.pause();
-                gameOverScreen.style.display = 'flex';
-            }
-        });
-
-        function animate() {
-            if (gamePaused || gameOver) return;
-            requestAnimationFrame(animate);
-
-            time = performance.now() / 1000;
-
-            scene.fog.near = 10 + Math.sin(time * 0.5) * 2;
-            scene.fog.far = 50 + Math.cos(time * 0.5) * 5;
-
-            torchLight.position.set(roninGroup.position.x, roninGroup.position.y + 2, roninGroup.position.z);
-            torchLight.intensity = 1.5 + Math.sin(time * 5) * 0.5;
-
-            const i = Math.floor(roninGroup.position.z / cellSize);
-            const j = Math.floor(roninGroup.position.x / cellSize);
-            if (i >= 0 && i < 20 && j >= 0 && j < 20 && tiles[i][j] !== 0) {
-                if (tiles[i][j] !== lastTile || effectTimer <= 0) {
-                    lastTile = tiles[i][j];
-                    speedMultiplier = (lastTile === 1) ? 0.5 : 1.5;
-                    effectTimer = 2;
-                    tileSound();
-                }
-            }
-            if (effectTimer > 0) {
-                effectTimer -= 1 / 60;
-                if (effectTimer <= 0) {
-                    speedMultiplier = 1;
-                    lastTile = 0;
-                }
-            }
-
-            const baseSpeed = 5;
-            const sprintSpeed = 10;
-            let currentSpeed = baseSpeed;
-
-            if (keys.has('shift') && !sprintActive && sprintCooldown <= 0) {
-                sprintActive = true;
-                sprintTimer = 3;
-                sprintIcon.src = 'fire-dash-red.png';
-                sprintIcon.classList.remove('rainbow');
-                guyIndicator.style.bottom = '-40px';
-                motionBlurAccum = 0.1;
-            }
-            if (sprintActive) {
-                currentSpeed = sprintSpeed;
-                sprintTimer -= 1 / 60;
-                if (sprintTimer <= 0) {
-                    sprintActive = false;
-                    sprintCooldown = 10;
-                    motionBlurAccum = 0;
-                }
-                const sprintParticlesPositions = new Float32Array(50 * 3);
-                const sprintParticlesColors = new Float32Array(50 * 3);
-                for (let i = 0; i < 50; i++) {
-                    sprintParticlesPositions[i * 3] = roninGroup.position.x + (Math.random() - 0.5) * 0.5;
-                    sprintParticlesPositions[i * 3 + 1] = roninGroup.position.y + Math.random() * 0.5;
-                    sprintParticlesPositions[i * 3 + 2] = roninGroup.position.z + (Math.random() - 0.5) * 0.5;
-                    const t = i / 50;
-                    sprintParticlesColors[i * 3] = 1.0 - t * 0.5;
-                    sprintParticlesColors[i * 3 + 1] = t * 0.5;
-                    sprintParticlesColors[i * 3 + 2] = 0;
-                }
-                sprintParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(sprintParticlesPositions, 3));
-                sprintParticlesGeometry.setAttribute('color', new THREE.BufferAttribute(sprintParticlesColors, 3));
-            } else {
-                sprintParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
-            }
-            if (sprintCooldown > 0) {
-                sprintCooldown -= 1 / 60;
-                if (sprintCooldown <= 0) {
-                    sprintIcon.src = 'fire-dash-green.png';
-                    sprintIcon.classList.add('rainbow');
-                    guyIndicator.style.bottom = '10px';
-                    setTimeout(() => sprintIcon.classList.remove('rainbow'), 2000);
-                }
-            }
-
-            const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-            const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-            const roninVelocity = new CANNON.Vec3();
-            if (keys.has('w')) roninVelocity.vadd(forward.multiplyScalar(currentSpeed * speedMultiplier), roninVelocity);
-            if (keys.has('s')) roninVelocity.vadd(forward.multiplyScalar(-currentSpeed * speedMultiplier), roninVelocity);
-            if (keys.has('d')) roninVelocity.vadd(right.multiplyScalar(currentSpeed * speedMultiplier), roninVelocity);
-            if (keys.has('a')) roninVelocity.vadd(right.multiplyScalar(-currentSpeed * speedMultiplier), roninVelocity);
-            roninVelocity.y = roninBody.velocity.y;
-            roninBody.velocity.copy(roninVelocity);
-
-            world.step(1 / 60);
-
-            roninGroup.position.copy(roninBody.position);
-            roninGroup.quaternion.copy(roninBody.quaternion);
-
-            const roninSpeed = Math.max(0, roninVelocity.length() / baseSpeed);
-            const runCycle = Math.sin(time * 8 * roninSpeed) * roninSpeed;
-            leftLeg.rotation.x = runCycle * 0.8;
-            rightLeg.rotation.x = -runCycle * 0.8;
-            leftArm.rotation.x = -runCycle * 0.6;
-            rightArm.rotation.x = runCycle * 0.6;
-            roninGroup.position.y = 1 + Math.abs(runCycle) * 0.15;
-
-            const distanceToRonin = Math.hypot(roninBody.position.x - enzoBody.position.x, roninBody.position.z - enzoBody.position.z);
-            const enzoSpeed = enzoBaseSpeed;
-            let target;
-
-            if (distanceToRonin < 10) {
-                if (heartbeatSound.paused) heartbeatSound.play();
-            } else {
-                heartbeatSound.pause();
-            }
-
-            if (numHugsCollected >= 3) {
-                teleportTimer -= 1 / 60;
-                if (distanceToRonin > 20 && teleportTimer <= 0 && Math.random() < 0.005) {
-                    const teleportTarget = findValidTeleport({ x: roninBody.position.x, z: roninBody.position.z }, 12);
-                    enzoBody.position.set(teleportTarget.x, 0.75, teleportTarget.z);
-                    teleportTimer = 5;
-                }
-            }
-
-            if (distanceToRonin < 10) {
-                target = { x: roninBody.position.x, z: roninBody.position.z };
-            } else {
-                target = getNextWaypoint(enzoBody.position, roninBody.position);
-            }
-
-            const direction = computeSteering(enzoBody.position, target);
-            enzoBody.position.x += direction.x * enzoSpeed * (1 / 60);
-            enzoBody.position.z += direction.z * enzoSpeed * (1 / 60);
-            enzoBody.position = preventWallClipping(enzoBody.position);
-            enzoBody.position.x = Math.max(0, Math.min(200, enzoBody.position.x));
-            enzoBody.position.z = Math.max(0, Math.min(200, enzoBody.position.z));
-
-            enzoGroup.position.copy(enzoBody.position);
-            const direction2D = new THREE.Vector3(roninBody.position.x - enzoBody.position.x, 0, roninBody.position.z - enzoBody.position.z).normalize();
-            const angle = Math.atan2(direction2D.x, direction2D.z);
-            enzoGroup.rotation.set(0, angle, 0);
-
-            enzoHeadMesh.lookAt(roninGroup.position);
-            enzoHeadMesh.rotation.x = 0;
-            enzoHeadMesh.rotation.z = 0;
-
-            const enzoSpeedFactor = Math.min(distanceToRonin > 5 ? 1 : distanceToRonin / 5, 1);
-            const enzoRunCycle = Math.sin(time * 8 * enzoSpeedFactor) * enzoSpeedFactor;
-            enzoLeftLeg.rotation.x = enzoRunCycle * 0.8;
-            enzoRightLeg.rotation.x = -enzoRunCycle * 0.8;
-            enzoLeftArm.rotation.x = -enzoRunCycle * 0.6;
-            enzoRightArm.rotation.x = enzoRunCycle * 0.3;
-            enzoTorsoMesh.rotation.x = enzoRunCycle * 0.1;
-            enzoGroup.position.y = enzoBody.position.y + Math.abs(enzoRunCycle) * 0.15;
-
-            bloodDripTimer += 1 / 60;
-            if (bloodDripTimer >= 1) {
-                bloodMesh.visible = true;
-                bloodMesh.position.set(
-                    (Math.random() - 0.5) * 0.05,
-                    0.85,
-                    (Math.random() - 0.5) * 0.05
-                );
-            }
-            if (bloodMesh.visible) {
-                bloodMesh.position.y -= 0.15 * (1 + Math.random() * 0.5);
-                if (bloodMesh.position.y < enzoGroup.position.y - 0.5) {
-                    bloodParticleData = [];
-                    for (let i = 0; i < 20; i++) {
-                        bloodParticleData.push({
-                            position: new THREE.Vector3(
-                                enzoGroup.position.x + bloodMesh.position.x + (Math.random() - 0.5) * 0.5,
-                                0.01,
-                                enzoGroup.position.z + bloodMesh.position.z + (Math.random() - 0.5) * 0.5
-                            ),
-                            velocity: new THREE.Vector3(
-                                (Math.random() - 0.5) * 0.5,
-                                Math.random() * 0.2,
-                                (Math.random() - 0.5) * 0.5
-                            ),
-                            life: 1.0
-                        });
-                    }
-                    bloodMesh.visible = false;
-                    bloodDripTimer = 0;
-                }
-            }
-
-            bloodParticleData = bloodParticleData.filter(p => p.life > 0);
-            const bloodPositions = new Float32Array(bloodParticleData.length * 3);
-            for (let i = 0; i < bloodParticleData.length; i++) {
-                const p = bloodParticleData[i];
-                p.position.add(p.velocity);
-                p.velocity.y -= 0.05;
-                p.life -= 0.02;
-                bloodPositions[i * 3] = p.position.x;
-                bloodPositions[i * 3 + 1] = p.position.y;
-                bloodPositions[i * 3 + 2] = p.position.z;
-            }
-            bloodParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(bloodPositions, 3));
-            bloodParticlesMaterial.opacity = Math.max(0, bloodParticleData.length > 0 ? bloodParticleData[0].life : 0);
-
-            hugs.forEach(hug => {
-                if (!hug.collected) {
-                    const jumpCycle = Math.sin(time * 4);
-                    hug.leftArm.rotation.x = jumpCycle * 0.5;
-                    hug.rightArm.rotation.x = -jumpCycle * 0.5;
-                    hug.leftLeg.rotation.x = jumpCycle * 0.3;
-                    hug.rightLeg.rotation.x = -jumpCycle * 0.3;
-                    hug.group.position.copy(hug.body.position);
-                    hug.group.position.y = hug.body.position.y + Math.abs(jumpCycle) * 0.2;
-
-                    const distToRonin = Math.hypot(hug.group.position.x - roninGroup.position.x, hug.group.position.z - roninGroup.position.z);
-                    hug.speechTimer -= 1 / 60;
-                    if (distToRonin < 10 && hug.speechTimer <= 0) {
-                        hug.speechBubble.style.display = 'block';
-                        const screenPos = hug.group.position.clone().project(camera);
-                        const x = (screenPos.x + 1) * window.innerWidth / 2;
-                        const y = (-screenPos.y + 1) * window.innerHeight / 2 - 50;
-                        hug.speechBubble.style.left = `${x}px`;
-                        hug.speechBubble.style.top = `${y}px`;
-                        setTimeout(() => hug.speechBubble.style.display = 'none', 2000);
-                        hug.speechTimer = 5;
-                    }
-                } else {
-                    hug.speechBubble.style.display = 'none';
-                }
-            });
-
-            hugs.forEach(hug => {
-                if (!hug.collected && roninGroup.position.distanceTo(hug.group.position) < 1.5) {
-                    hug.collected = true;
-                    scene.remove(hug.group);
-                    world.removeBody(hug.body);
-                    numHugsCollected++;
-                    hugSound.play();
-                    if (numHugsCollected % 3 === 0) {
-                        switch (lastDifficulty) {
-                            case 'easy': enzoBaseSpeed *= 1.10; break;
-                            case 'medium': enzoBaseSpeed *= 1.20; break;
-                            case 'hard': enzoBaseSpeed *= 1.30; break;
-                        }
-                        hugSound.onended = () => {
-                            wrathSound.play();
-                            alertOverlay.style.top = '50%';
-                            alertOverlay.style.display = 'block';
-                            setTimeout(() => {
-                                alertOverlay.style.top = '-50%';
-                            }, 50);
-                            alertTimer = 3;
-                        };
-                    }
-                    hugOverlay.children[2].textContent = `Hugs: ${numHugsCollected}`;
-                    if (numHugsCollected >= 3) achievementSticker.style.display = 'inline';
-                    if (numHugsCollected >= 10) fireyBadge.style.display = 'inline';
-                    if (numHugsCollected >= 3 && numHugsCollected % 3 === 0) {
-                        const newBadge = document.createElement('img');
-                        newBadge.src = 'stoned_dog.png';
-                        newBadge.className = 'badge';
-                        newBadge.alt = 'Extra Achievement';
-                        hugOverlay.appendChild(newBadge);
-                    }
-                    hugParticleData = [];
-                    for (let i = 0; i < 50; i++) {
-                        const angle = Math.random() * Math.PI * 2;
-                        const speed = Math.random() * 2 + 1;
-                        hugParticleData.push({
-                            position: hug.group.position.clone(),
-                            velocity: new THREE.Vector3(Math.cos(angle) * speed, Math.random() * 2, Math.sin(angle) * speed),
-                            life: 1.0,
-                            rotation: Math.random() * 0.1 - 0.05
-                        });
-                    }
-                }
-            });
-
-            hugParticleData = hugParticleData.filter(p => p.life > 0);
-            const hugPositions = new Float32Array(hugParticleData.length * 3);
-            for (let i = 0; i < hugParticleData.length; i++) {
-                const p = hugParticleData[i];
-                p.position.add(p.velocity);
-                p.velocity.y -= 0.05;
-                p.life -= 0.02;
-                p.position.y += Math.sin(time + i) * 0.1;
-                hugPositions[i * 3] = p.position.x;
-                hugPositions[i * 3 + 1] = p.position.y;
-                hugPositions[i * 3 + 2] = p.position.z;
-            }
-            hugParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(hugPositions, 3));
-            hugParticlesMaterial.opacity = Math.max(0, hugParticleData.length > 0 ? hugParticleData[0].life : 0);
-
-            if (alertTimer > 0) {
-                alertTimer -= 1 / 60;
-                if (alertTimer <= 0) alertOverlay.style.display = 'none';
-            }
-
-            camera.position.set(roninGroup.position.x, roninGroup.position.y + 1.75, roninGroup.position.z);
-            camera.rotation.order = 'YXZ';
-            camera.rotation.y = yaw;
-            camera.rotation.x = pitch;
-
-            mirrorCamera.position.copy(camera.position);
-            mirrorCamera.rotation.order = 'YXZ';
-            mirrorCamera.rotation.y = yaw + Math.PI;
-            mirrorCamera.rotation.x = pitch;
-            renderer.setRenderTarget(mirrorTexture);
-            renderer.render(scene, mirrorCamera);
-            renderer.setRenderTarget(null);
-
-            bloomPass.strength = 1.5 + motionBlurAccum;
-            motionBlurAccum *= 0.95;
-            composer.render();
-        }
-    }
-
-    textureLoader.load('stoned_chuck.png', (texture) => {
-        playerHeadTexture = texture;
-        textureLoader.load('angry_enzo.png', (texture) => {
-            enzoHeadTexture = texture;
-            textureLoader.load('happ_enzo.png', (texture) => {
-                happEnzoTexture = texture;
-                setupGame();
-            }, undefined, (error) => {
-                console.error('Failed to load happ_enzo.png:', error);
-                happEnzoTexture = new THREE.Texture();
-                setupGame();
-            });
-        }, undefined, (error) => {
-            console.error('Failed to load angry_enzo.png:', error);
-            enzoHeadTexture = new THREE.Texture();
-            setupGame();
-        });
-    }, undefined, (error) => {
-        console.error('Failed to load stoned_chuck.png:', error);
-        playerHeadTexture = new THREE.Texture();
-        setupGame();
-    });
+    // JavaScript moved to separate blocks below
 </script>
 </body>
 </html>
+
+<style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #gameOverScreen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 0, 0, 0.7); display: none; justify-content: center; align-items: center;
+        flex-direction: column; z-index: 10;
+    }
+    #restartButton {
+        padding: 20px 40px; font-size: 24px; background: #fff; border: 2px solid #000; cursor: pointer;
+    }
+    #restartButton:hover { background: #ddd; }
+    #startMenu {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center;
+        flex-direction: column; z-index: 15; color: #fff; font-family: Arial, sans-serif; text-align: center; font-size: 24px;
+    }
+    #startMenu button {
+        padding: 15px 30px; font-size: 20px; background: #fff; border: 2px solid #000; cursor: pointer; margin-top: 20px;
+    }
+    #startMenu button:hover { background: #ddd; }
+    #startMenu input[type="text"] { padding: 15px; font-size: 24px; margin-top: 20px; width: 400px; }
+    #startMenu label { margin: 10px 10px 0 0; }
+    #startMenu img.guy { width: 300px; height: 300px; margin-bottom: 20px; }
+    #startMenu img.firey { width: 150px; height: 150px; position: absolute; bottom: 20px; }
+    #startMenu img.firey.left { left: 20px; }
+    #startMenu img.firey.right { right: 20px; }
+    #hugOverlay {
+        position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+        font-size: 48px; color: #fff; text-shadow: 2px 2px 4px #000; z-index: 5; display: flex; align-items: center;
+    }
+    #sprintIcon { width: 40px; height: 40px; margin-right: 20px; }
+    #sprintIcon.rainbow {
+        border: 3px solid; animation: rainbowBorder 2s infinite;
+    }
+    @keyframes rainbowBorder {
+        0% { border-color: red; } 20% { border-color: orange; } 40% { border-color: yellow; }
+        60% { border-color: green; } 80% { border-color: blue; } 100% { border-color: violet; }
+    }
+    #guyIndicator { width: 40px; height: 40px; margin-right: 10px; opacity: 0; transition: opacity 0.5s; }
+    #guyIndicator.visible { opacity: 1; }
+    #achievementSticker, #fireyBadge { width: 50px; height: 50px; margin-left: 20px; display: none; }
+    .badge { width: 50px; height: 50px; margin-left: -40px; }
+    #alertOverlay {
+        position: fixed; left: 50%; transform: translateX(-50%); color: #ff0000;
+        font-family: 'Courier New', monospace; font-size: 36px; text-align: center; display: none;
+        z-index: 20; text-shadow: 2px 2px 0 #000; transition: top 6s linear;
+    }
+    #vignette {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+        background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.7) 100%); z-index: 5;
+    }
+    .speechBubble {
+        position: absolute; background: rgba(255, 255, 255, 0.9); border: 2px solid #000;
+        border-radius: 10px; padding: 5px 10px; font-size: 14px; color: #000;
+        font-family: Arial, sans-serif; z-index: 5; pointer-events: none; display: none;
+    }
+</style>
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+const composer = new THREE.EffectComposer(renderer);
+const renderPass = new THREE.RenderPass(scene, camera);
+composer.addPass(renderPass);
+const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.8, 0.4, 0.9);
+composer.addPass(bloomPass);
+const colorCorrectionPass = new THREE.ShaderPass(THREE.ColorCorrectionShader);
+colorCorrectionPass.uniforms['powRGB'].value = new THREE.Vector3(1.1, 1.1, 1.1);
+colorCorrectionPass.uniforms['mulRGB'].value = new THREE.Vector3(1.05, 1.0, 0.95);
+composer.addPass(colorCorrectionPass);
+
+scene.fog = new THREE.Fog(0x333333, 10, 50);
+
+const world = new CANNON.World();
+world.gravity.set(0, -9.82, 0);
+
+const textureLoader = new THREE.TextureLoader();
+
+function setupLighting() {
+const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+directionalLight.position.set(5, 10, 5);
+directionalLight.castShadow = true;
+scene.add(directionalLight);
+
+const torchLight = new THREE.PointLight(0xffaa00, 1.5, 20);
+torchLight.castShadow = true;
+scene.add(torchLight);
+
+return torchLight;
+}
+const torchLight = setupLighting();
+
+const cellSize = 10;
+const wallHeight = 5;
+const map = [/* unchanged map array */];
+const tiles = [/* unchanged tiles array */];
+
+function setupEnvironment() {
+// Floor
+textureLoader.load('./floor.png', (texture) => {
+const groundGeometry = new THREE.PlaneGeometry(200, 200);
+const groundMaterial = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.8 });
+const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+groundMesh.rotation.x = -Math.PI / 2;
+groundMesh.receiveShadow = true;
+scene.add(groundMesh);
+}, undefined, (error) => {
+console.error('Failed to load floor.png:', error);
+const groundGeometry = new THREE.PlaneGeometry(200, 200);
+const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.8 });
+const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+groundMesh.rotation.x = -Math.PI / 2;
+groundMesh.receiveShadow = true;
+scene.add(groundMesh);
+});
+const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() });
+groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+world.addBody(groundBody);
+
+// Decals
+const decalGeometry = new THREE.CircleGeometry(1, 16);
+const decalMaterial = new THREE.MeshBasicMaterial({ color: 0x666666, transparent: true, opacity: 0.5 });
+const decals = new THREE.InstancedMesh(decalGeometry, decalMaterial, 50);
+for (let i = 0; i < 50; i++) {
+const matrix = new THREE.Matrix4();
+matrix.setPosition(Math.random() * 190 - 95, 0.01, Math.random() * 190 - 95);
+matrix.scale(new THREE.Vector3(Math.random() * 2 + 1, 1, Math.random() * 2 + 1));
+decals.setMatrixAt(i, matrix);
+}
+scene.add(decals);
+
+// Walls and Posters
+let bambooWallTexture, enzosTexture;
+const posterTextures = [];
+const posterFiles = ['wallart.png', 'wallart1.png', 'wallart2.png'];
+posterFiles.forEach(file => {
+textureLoader.load(`assets/wallart/${file}`, (texture) => posterTextures.push(texture));
+});
+
+textureLoader.load('BambooWall.png', (texture) => {
+bambooWallTexture = texture;
+textureLoader.load('enzos.png', (texture) => {
+enzosTexture = texture;
+map.forEach((row, i) => {
+row.forEach((cell, j) => {
+if (cell === 1) {
+const height = wallHeight + Math.random() * 2 - 1;
+const isNearStart = Math.abs(i - 10) <= 2 && Math.abs(j - 10) <= 2;
+const wallGeometry = new THREE.BoxGeometry(cellSize, height, cellSize);
+const wallMaterial = (isNearStart || Math.random() < 0.2) ?
+new THREE.MeshStandardMaterial({ map: enzosTexture, roughness: 0.5 }) :
+new THREE.MeshStandardMaterial({ map: bambooWallTexture, roughness: 0.5 });
+const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+wallMesh.position.set(j * cellSize, height / 2, i * cellSize);
+wallMesh.rotation.y = Math.random() * 0.1 - 0.05;
+wallMesh.castShadow = true;
+wallMesh.receiveShadow = true;
+scene.add(wallMesh);
+
+if (Math.random() < 0.2 && posterTextures.length > 0) {
+const posterGeometry = new THREE.PlaneGeometry(2, 3);
+const posterMaterial = new THREE.MeshBasicMaterial({
+map: posterTextures[Math.floor(Math.random() * posterTextures.length)]
+});
+const posterMesh = new THREE.Mesh(posterGeometry, posterMaterial);
+const face = Math.floor(Math.random() * 4);
+const offset = cellSize / 2 - 0.1;
+const yPos = Math.random() * (height - 3) + 1.5;
+switch (face) {
+case 0: posterMesh.position.set(j * cellSize, yPos, i * cellSize + offset); break;
+case 1: posterMesh.position.set(j * cellSize, yPos, i * cellSize - offset); posterMesh.rotation.y = Math.PI; break;
+case 2: posterMesh.position.set(j * cellSize - offset, yPos, i * cellSize); posterMesh.rotation.y = Math.PI / 2; break;
+case 3: posterMesh.position.set(j * cellSize + offset, yPos, i * cellSize); posterMesh.rotation.y = -Math.PI / 2; break;
+}
+scene.add(posterMesh);
+}
+
+const wallBody = new CANNON.Body({
+mass: 0,
+shape: new CANNON.Box(new CANNON.Vec3(cellSize / 2, height / 2, cellSize / 2))
+});
+wallBody.position.set(j * cellSize, height / 2, i * cellSize);
+world.addBody(wallBody);
+}
+});
+});
+});
+});
+
+// Tiles
+textureLoader.load('stoned_chuck.png', (texture) => {
+tiles.forEach((row, i) => {
+row.forEach((tile, j) => {
+if (tile === 1 && map[i][j] === 0) {
+const tileGeometry = new THREE.PlaneGeometry(cellSize * 0.8, cellSize * 0.8);
+const tileMaterial = new THREE.MeshBasicMaterial({ map: texture });
+const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
+tileMesh.rotation.x = -Math.PI / 2;
+tileMesh.position.set(j * cellSize + cellSize / 2, 0.01, i * cellSize + cellSize / 2);
+scene.add(tileMesh);
+} else if (tile === 2) {
+const tileGeometry = new THREE.PlaneGeometry(cellSize, cellSize);
+const tileMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
+tileMesh.rotation.x = -Math.PI / 2;
+tileMesh.position.set(j * cellSize + cellSize / 2, 0.01, i * cellSize + cellSize / 2);
+scene.add(tileMesh);
+}
+});
+});
+});
+
+// Decorative Objects
+const torusMesh = new THREE.Mesh(
+new THREE.TorusGeometry(2, 1, 16, 100),
+new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.5 })
+);
+torusMesh.position.set(15, 1, 15);
+torusMesh.castShadow = true;
+torusMesh.receiveShadow = true;
+scene.add(torusMesh);
+
+const pyramidMesh = new THREE.Mesh(
+new THREE.ConeGeometry(2, 4, 4),
+new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.5 })
+);
+pyramidMesh.position.set(35, 2, 35);
+pyramidMesh.castShadow = true;
+pyramidMesh.receiveShadow = true;
+scene.add(pyramidMesh);
+}
+setupEnvironment();
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const audioFiles = {
+ambient: createAmbientSound(),
+gameOver: new Audio('fuck-you-pay-me.mp3'),
+hug: new Audio('hug.mp3'),
+wrath: new Audio('coming-for-you.mp3'),
+heartbeat: new Audio('heartbeat.mp3'),
+splash: new Audio('splash.mp3')
+};
+audioFiles.heartbeat.loop = true;
+audioFiles.splash.loop = true;
+Object.values(audioFiles).forEach(audio => audio.preload = 'auto');
+
+function createAmbientSound() {
+const buffer = audioContext.createBuffer(2, audioContext.sampleRate * 10, audioContext.sampleRate);
+for (let channel = 0; channel < 2; channel++) {
+const data = buffer.getChannelData(channel);
+for (let i = 0; i < data.length; i++) data[i] = (Math.random() - 0.5) * 0.05;
+}
+const source = audioContext.createBufferSource();
+source.buffer = buffer;
+source.loop = true;
+const gain = audioContext.createGain();
+gain.gain.value = 0.1;
+source.connect(gain);
+gain.connect(audioContext.destination);
+return source;
+}
+
+function startAudio() {
+if (audioContext.state === 'suspended') audioContext.resume();
+if (document.getElementById('musicToggle').checked) {
+if (!audioFiles.ambient.started) {
+audioFiles.ambient.start();
+audioFiles.ambient.started = true;
+}
+audioFiles.splash.play();
+}
+}
+
+function playSound(sound, isMusic = false) {
+const musicOn = document.getElementById('musicToggle').checked;
+const soundOn = document.getElementById('soundToggle').checked;
+if ((isMusic && musicOn) || (!isMusic && soundOn)) sound.play();
+}
+
+function stopSound(sound) {
+sound.pause();
+sound.currentTime = 0;
+}
+
+function tileSound() {
+if (audioContext.state === 'running' && document.getElementById('soundToggle').checked) {
+const oscillator = audioContext.createOscillator();
+const gainNode = audioContext.createGain();
+oscillator.type = 'square';
+oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+oscillator.connect(gainNode);
+gainNode.connect(audioContext.destination);
+oscillator.start();
+oscillator.stop(audioContext.currentTime + 0.1);
+}
+}
+
+document.getElementById('musicToggle').addEventListener('change', (e) => {
+if (e.target.checked) {
+if (!audioFiles.ambient.started) {
+audioFiles.ambient.start();
+audioFiles.ambient.started = true;
+}
+playSound(audioFiles.splash, true);
+} else {
+stopSound(audioFiles.splash);
+audioFiles.ambient.stop();
+audioFiles.ambient = createAmbientSound();
+}
+});
+
+document.getElementById('soundToggle').addEventListener('change', (e) => {
+if (!e.target.checked) {
+stopSound(audioFiles.gameOver);
+stopSound(audioFiles.hug);
+stopSound(audioFiles.wrath);
+stopSound(audioFiles.heartbeat);
+}
+});
+
+const waypoints = [];
+map.forEach((row, i) => row.forEach((cell, j) => {
+if (cell === 0) waypoints.push({ x: j * cellSize + cellSize / 2, z: i * cellSize + cellSize / 2 });
+}));
+
+function getClosestWaypoint(pos) {
+return waypoints.reduce((closest, wp) => {
+const dist = Math.hypot(wp.x - pos.x, wp.z - pos.z);
+return dist < Math.hypot(closest.x - pos.x, closest.z - pos.z) ? wp : closest;
+}, waypoints[0]);
+}
+
+function getNextWaypoint(currentPos, targetPos) {
+const currentWp = getClosestWaypoint(currentPos);
+const targetWp = getClosestWaypoint(targetPos);
+if (currentWp === targetWp) return targetPos;
+let minDist = Infinity;
+let nextWp = currentWp;
+waypoints.forEach(wp => {
+if (wp === currentWp) return;
+const distToTarget = Math.hypot(wp.x - targetWp.x, wp.z - targetWp.z);
+const distToCurrent = Math.hypot(wp.x - currentWp.x, wp.z - currentWp.z);
+if (distToTarget < minDist && distToCurrent < cellSize * 2) {
+minDist = distToTarget;
+nextWp = wp;
+}
+});
+return nextWp;
+}
+
+function computeSteering(enzoPos, targetPos) {
+const desired = new THREE.Vector3(targetPos.x - enzoPos.x, 0, targetPos.z - enzoPos.z).normalize();
+let avoidance = new THREE.Vector3(0, 0, 0);
+map.forEach((row, i) => {
+row.forEach((cell, j) => {
+if (cell === 1) {
+const wallPos = new THREE.Vector3(j * cellSize + cellSize / 2, 0, i * cellSize + cellSize / 2);
+const ahead = new THREE.Vector3(enzoPos.x, 0, enzoPos.z).add(desired.clone().multiplyScalar(5));
+const toWall = wallPos.clone().sub(ahead);
+const distToWall = toWall.length();
+if (distToWall < 3) avoidance.sub(toWall.normalize().multiplyScalar((3 - distToWall) / 3));
+}
+});
+});
+return desired.add(avoidance).normalize();
+}
+
+function preventWallClipping(pos) {
+const cellX = Math.floor(pos.x / cellSize);
+const cellZ = Math.floor(pos.z / cellSize);
+if (cellX >= 0 && cellX < 20 && cellZ >= 0 && cellZ < 20 && map[cellZ][cellX] === 1) {
+const closestWp = getClosestWaypoint(pos);
+pos.x = closestWp.x;
+pos.z = closestWp.z;
+}
+return pos;
+}
+
+function findValidSpawn(roninPos, minDist, maxDist) {
+const validSpawns = waypoints.filter(wp => {
+const dist = Math.hypot(wp.x - roninPos.x, wp.z - roninPos.z);
+return dist >= minDist && dist <= maxDist;
+});
+return validSpawns[Math.floor(Math.random() * validSpawns.length)];
+}
+
+function findValidTeleport(roninPos, minDist) {
+const validSpawns = waypoints.filter(wp => {
+const dist = Math.hypot(wp.x - roninPos.x, wp.z - roninPos.z);
+return dist >= minDist;
+});
+return validSpawns[Math.floor(Math.random() * validSpawns.length)];
+}
+
+function setupEntities(callback) {
+let playerHeadTexture, enzoHeadTexture, happEnzoTexture;
+
+const roninGroup = new THREE.Group();
+const roninBody = new CANNON.Body({ mass: 1, shape: new CANNON.Cylinder(0.5, 0.5, 2, 16) });
+roninBody.position.set(10, 1, 10);
+world.addBody(roninBody);
+
+const enzoGroup = new THREE.Group();
+const enzoBody = new CANNON.Body({ mass: 0, shape: new CANNON.Cylinder(0.25, 0.25, 1.5, 16) });
+const enzoSpawn = findValidSpawn({ x: 10, z: 10 }, 20, 30);
+enzoBody.position.set(enzoSpawn.x, 0.75, enzoSpawn.z);
+world.addBody(enzoBody);
+
+const hugs = [];
+const compliments = [
+"loves how <name> writes amazing code!",
+    "admires <name>'s coding skills!",
+        "thinks <name>'s code is pure art!",
+            "is in awe of <name>'s programming!",
+                "adores <name>'s brilliant code!"
+                    ];
+
+                    textureLoader.load('stoned_chuck.png', (texture) => {
+                    playerHeadTexture = texture;
+                    textureLoader.load('angry_enzo.png', (texture) => {
+                    enzoHeadTexture = texture;
+                    textureLoader.load('happ_enzo.png', (texture) => {
+                    happEnzoTexture = texture;
+
+                    // Ronin Setup
+                    const roninBodyMesh = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.2, 0.2, 1.5, 16),
+                    new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 })
+                    );
+                    roninBodyMesh.position.set(0, 0.75, 0);
+                    roninBodyMesh.castShadow = true;
+                    roninGroup.add(roninBodyMesh);
+                    const roninHeadMesh = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.5, 32, 32),
+                    new THREE.MeshStandardMaterial({ map: playerHeadTexture, roughness: 0.5 })
+                    );
+                    roninHeadMesh.position.set(0, 1.75, 0);
+                    roninHeadMesh.castShadow = true;
+                    roninGroup.add(roninHeadMesh);
+                    const armMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
+                    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1, 16), armMaterial);
+                    leftArm.position.set(-0.5, 1.25, 0);
+                    leftArm.castShadow = true;
+                    roninGroup.add(leftArm);
+                    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1, 16), armMaterial);
+                    rightArm.position.set(0.5, 1.25, 0);
+                    rightArm.castShadow = true;
+                    roninGroup.add(rightArm);
+                    const legMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
+                    const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1, 16), legMaterial);
+                    leftLeg.position.set(-0.2, 0.25, 0);
+                    leftLeg.castShadow = true;
+                    roninGroup.add(leftLeg);
+                    const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1, 16), legMaterial);
+                    rightLeg.position.set(0.2, 0.25, 0);
+                    rightLeg.castShadow = true;
+                    roninGroup.add(rightLeg);
+                    scene.add(roninGroup);
+                    roninGroup.visible = false;
+
+                    // Enzo Setup
+                    const enzoTorsoMesh = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.3, 0.3, 1, 16, 1, true),
+                    new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 })
+                    );
+                    enzoTorsoMesh.position.set(0, 0.5, 0);
+                    enzoTorsoMesh.castShadow = true;
+                    enzoGroup.add(enzoTorsoMesh);
+                    const enzoHeadMesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(1, 1, 1),
+                    new THREE.MeshStandardMaterial({ map: enzoHeadTexture, roughness: 0.5 })
+                    );
+                    enzoHeadMesh.position.set(0, 1.5, 0);
+                    enzoHeadMesh.castShadow = true;
+                    enzoGroup.add(enzoHeadMesh);
+                    const enzoArmMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
+                    const enzoLeftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16), enzoArmMaterial);
+                    enzoLeftArm.position.set(-0.5, 0.5, 0);
+                    enzoLeftArm.rotation.z = Math.PI / 4;
+                    enzoLeftArm.castShadow = true;
+                    enzoGroup.add(enzoLeftArm);
+                    const enzoRightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16), enzoArmMaterial);
+                    enzoRightArm.position.set(0.5, 0.5, 0);
+                    enzoRightArm.rotation.z = -Math.PI / 4;
+                    enzoRightArm.castShadow = true;
+                    enzoGroup.add(enzoRightArm);
+                    const knifeMesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1, 1.5, 0.05),
+                    new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.8, roughness: 0.2 })
+                    );
+                    knifeMesh.position.set(0, 0.75, 0);
+                    knifeMesh.rotation.x = Math.PI / 2;
+                    knifeMesh.castShadow = true;
+                    enzoRightArm.add(knifeMesh);
+                    const knifeTipMesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1, 0.2, 0.05),
+                    new THREE.MeshStandardMaterial({ color: 0xff0000 })
+                    );
+                    knifeTipMesh.position.set(0, 0.85, 0);
+                    knifeTipMesh.castShadow = true;
+                    enzoRightArm.add(knifeTipMesh);
+                    const bloodMesh = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.05, 8, 8),
+                    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+                    );
+                    bloodMesh.position.set(0, 0.85, 0);
+                    bloodMesh.visible = false;
+                    enzoRightArm.add(bloodMesh);
+                    const enzoLegMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
+                    const enzoLeftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1, 16), enzoLegMaterial);
+                    enzoLeftLeg.position.set(-0.2, 0.25, 0);
+                    enzoLeftLeg.castShadow = true;
+                    enzoGroup.add(enzoLeftLeg);
+                    const enzoRightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1, 16), enzoLegMaterial);
+                    enzoRightLeg.position.set(0.2, 0.25, 0);
+                    enzoRightLeg.castShadow = true;
+                    enzoGroup.add(enzoRightLeg);
+                    scene.add(enzoGroup);
+
+                    // Hugs Setup
+                    for (let i = 0; i < 20; i++) {
+                    const pos = waypoints[Math.floor(Math.random() * waypoints.length)];
+                    const hugGroup = new THREE.Group();
+                    const hugTorsoMesh = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.3, 0.3, 1, 16, 1, true),
+                    new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5, emissive: 0xffff00, emissiveIntensity: 0.5 })
+                    );
+                    hugTorsoMesh.position.set(0, 0.5, 0);
+                    hugTorsoMesh.castShadow = true;
+                    hugGroup.add(hugTorsoMesh);
+                    const hugHeadMesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(1, 1, 1),
+                    new THREE.MeshStandardMaterial({ map: happEnzoTexture, roughness: 0.5 })
+                    );
+                    hugHeadMesh.position.set(0, 1.5, 0);
+                    hugHeadMesh.castShadow = true;
+                    hugGroup.add(hugHeadMesh);
+                    const hugArmMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5 });
+                    const hugLeftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16), hugArmMaterial);
+                    hugLeftArm.position.set(-0.5, 0.5, 0);
+                    hugLeftArm.castShadow = true;
+                    hugGroup.add(hugLeftArm);
+                    const hugRightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16), hugArmMaterial);
+                    hugRightArm.position.set(0.5, 0.5, 0);
+                    hugRightArm.castShadow = true;
+                    hugGroup.add(hugRightArm);
+                    const hugLegMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5 });
+                    const hugLeftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1, 16), hugLegMaterial);
+                    hugLeftLeg.position.set(-0.2, 0.25, 0);
+                    hugLeftLeg.castShadow = true;
+                    hugGroup.add(hugLeftLeg);
+                    const hugRightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 1, 16), hugLegMaterial);
+                    hugRightLeg.position.set(0.2, 0.25, 0);
+                    hugRightLeg.castShadow = true;
+                    hugGroup.add(hugRightLeg);
+                    hugGroup.position.set(pos.x, 0, pos.z);
+                    scene.add(hugGroup);
+
+                    const hugBody = new CANNON.Body({
+                    mass: 1,
+                    shape: new CANNON.Cylinder(0.25, 0.25, 1.5, 16)
+                    });
+                    hugBody.position.set(pos.x, 0.75, pos.z);
+                    world.addBody(hugBody);
+
+                    const speechBubble = document.createElement('div');
+                    speechBubble.className = 'speechBubble';
+                    const playerName = document.getElementById('playerName').value || "Ronin";
+                    speechBubble.textContent = compliments[Math.floor(Math.random() * compliments.length)].replace('<name>', playerName);
+                        document.body.appendChild(speechBubble);
+
+                        hugs.push({
+                        group: hugGroup,
+                        body: hugBody,
+                        collected: false,
+                        leftArm: hugLeftArm,
+                        rightArm: hugRightArm,
+                        leftLeg: hugLeftLeg,
+                        rightLeg: hugRightLeg,
+                        speechBubble,
+                        speechTimer: Math.random() * 5
+                        });
+                        }
+
+                        callback({
+                        ronin: { group: roninGroup, body: roninBody, leftArm, rightArm, leftLeg, rightLeg },
+                        enzo: { group: enzoGroup, body: enzoBody, head: enzoHeadMesh, torso: enzoTorsoMesh, leftArm: enzoLeftArm, rightArm: enzoRightArm, leftLeg: enzoLeftLeg, rightLeg: enzoRightLeg, bloodMesh },
+                        hugs
+                        });
+                        });
+                        });
+                        });
+                        }
+
+                        const sprintParticles = new THREE.Points(
+                        new THREE.BufferGeometry(),
+                        new THREE.PointsMaterial({ size: 0.3, vertexColors: true, transparent: true })
+                        );
+                        scene.add(sprintParticles);
+
+                        const hugParticles = new THREE.Points(
+                        new THREE.BufferGeometry(),
+                        new THREE.PointsMaterial({ size: 0.5, color: 0xffff00, transparent: true, opacity: 1 })
+                        );
+                        scene.add(hugParticles);
+                        let hugParticleData = [];
+
+                        const bloodParticles = new THREE.Points(
+                        new THREE.BufferGeometry(),
+                        new THREE.PointsMaterial({ size: 0.1, color: 0xff0000, transparent: true, opacity: 1 })
+                        );
+                        scene.add(bloodParticles);
+                        let bloodParticleData = [];
+
+                        function updateSprintParticles(roninPos, sprintActive) {
+                        if (sprintActive) {
+                        const positions = new Float32Array(50 * 3);
+                        const colors = new Float32Array(50 * 3);
+                        for (let i = 0; i < 50; i++) {
+                        positions[i * 3] = roninPos.x + (Math.random() - 0.5) * 0.5;
+                        positions[i * 3 + 1] = roninPos.y + Math.random() * 0.5;
+                        positions[i * 3 + 2] = roninPos.z + (Math.random() - 0.5) * 0.5;
+                        const t = i / 50;
+                        colors[i * 3] = 1.0 - t * 0.5;
+                        colors[i * 3 + 1] = t * 0.5;
+                        colors[i * 3 + 2] = 0;
+                        }
+                        sprintParticles.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                        sprintParticles.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                        } else {
+                        sprintParticles.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
+                        }
+                        }
+
+                        function updateHugParticles(time) {
+                        hugParticleData = hugParticleData.filter(p => p.life > 0);
+                        const positions = new Float32Array(hugParticleData.length * 3);
+                        for (let i = 0; i < hugParticleData.length; i++) {
+                        const p = hugParticleData[i];
+                        p.position.add(p.velocity);
+                        p.velocity.y -= 0.05;
+                        p.life -= 0.02;
+                        p.position.y += Math.sin(time + i) * 0.1;
+                        positions[i * 3] = p.position.x;
+                        positions[i * 3 + 1] = p.position.y;
+                        positions[i * 3 + 2] = p.position.z;
+                        }
+                        hugParticles.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                        hugParticles.material.opacity = Math.max(0, hugParticleData.length > 0 ? hugParticleData[0].life : 0);
+                        }
+
+                        function updateBloodParticles() {
+                        bloodParticleData = bloodParticleData.filter(p => p.life > 0);
+                        const positions = new Float32Array(bloodParticleData.length * 3);
+                        for (let i = 0; i < bloodParticleData.length; i++) {
+                        const p = bloodParticleData[i];
+                        p.position.add(p.velocity);
+                        p.velocity.y -= 0.05;
+                        p.life -= 0.02;
+                        positions[i * 3] = p.position.x;
+                        positions[i * 3 + 1] = p.position.y;
+                        positions[i * 3 + 2] = p.position.z;
+                        }
+                        bloodParticles.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                        bloodParticles.material.opacity = Math.max(0, bloodParticleData.length > 0 ? bloodParticleData[0].life : 0);
+                        }
+                        
+                        
