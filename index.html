@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enzo Stabs - Enhanced with Fixed Mirror and Overlay</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10;
+        }
+        #restartButton {
+            padding: 20px 40px;
+            font-size: 24px;
+            background: #fff;
+            border: 2px solid #000;
+            cursor: pointer;
+        }
+        #restartButton:hover {
+            background: #ddd;
+        }
+        #hugOverlay {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            color: #fff;
+            text-shadow: 2px 2px 4px #000;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+<div id="gameOverScreen">
+    <button id="restartButton">Try For More Hugs</button>
+</div>
+<div id="hugOverlay">Hugs: 0</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+<script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 5);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+    const world = new CANNON.World();
+    world.gravity.set(0, -9.82, 0);
+
+    const groundGeometry = new THREE.PlaneGeometry(100, 100);
+    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.5 });
+    const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+    groundMesh.rotation.x = -Math.PI / 2;
+    groundMesh.receiveShadow = true;
+    scene.add(groundMesh);
+    const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() });
+    groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+    world.addBody(groundBody);
+
+    const maze = [
+        [1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,1,0,0,0,0,1],
+        [1,0,1,0,1,0,1,1,0,1],
+        [1,0,1,0,0,0,0,1,0,1],
+        [1,0,1,1,1,1,0,1,0,1],
+        [1,0,0,0,0,1,0,1,0,1],
+        [1,1,1,1,0,1,0,1,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,1,1,1,0,1],
+        [1,1,1,1,1,1,1,1,1,1]
+    ];
+    const tiles = [
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,2,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,2,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0]
+    ];
+    const cellSize = 10;
+    const wallHeight = 5;
+
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.setCrossOrigin('anonymous');
+    let enzosTexture, stonedChuckTexture;
+
+    textureLoader.load('enzos.png', (texture) => {
+        enzosTexture = texture;
+        maze.forEach((row, i) => {
+            row.forEach((cell, j) => {
+                if (cell === 1 && Math.random() < 0.3) {
+                    const wallGeometry = new THREE.BoxGeometry(cellSize, wallHeight, cellSize);
+                    const wallMaterial = new THREE.MeshStandardMaterial({ map: enzosTexture, roughness: 0.5 });
+                    const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+                    wallMesh.position.set(j * cellSize, wallHeight / 2, i * cellSize);
+                    wallMesh.castShadow = true;
+                    wallMesh.receiveShadow = true;
+                    scene.add(wallMesh);
+                    const wallBody = new CANNON.Body({
+                        mass: 0,
+                        shape: new CANNON.Box(new CANNON.Vec3(cellSize / 2, wallHeight / 2, cellSize / 2)),
+                    });
+                    wallBody.position.set(j * cellSize, wallHeight / 2, i * cellSize);
+                    world.addBody(wallBody);
+                } else if (cell === 1) {
+                    const wallGeometry = new THREE.BoxGeometry(cellSize, wallHeight, cellSize);
+                    const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, roughness: 0.5 });
+                    const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+                    wallMesh.position.set(j * cellSize, wallHeight / 2, i * cellSize);
+                    wallMesh.castShadow = true;
+                    wallMesh.receiveShadow = true;
+                    scene.add(wallMesh);
+                    const wallBody = new CANNON.Body({
+                        mass: 0,
+                        shape: new CANNON.Box(new CANNON.Vec3(cellSize / 2, wallHeight / 2, cellSize / 2)),
+                    });
+                    wallBody.position.set(j * cellSize, wallHeight / 2, i * cellSize);
+                    world.addBody(wallBody);
+                }
+            });
+        });
+    });
+
+    textureLoader.load('stoned_chuck.png', (texture) => {
+        stonedChuckTexture = texture;
+        tiles.forEach((row, i) => {
+            row.forEach((tile, j) => {
+                if (tile === 1) {
+                    const tileGeometry = new THREE.PlaneGeometry(cellSize, cellSize);
+                    const tileMaterial = new THREE.MeshBasicMaterial({ map: stonedChuckTexture });
+                    const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
+                    tileMesh.rotation.x = -Math.PI / 2;
+                    tileMesh.position.set(j * cellSize + cellSize / 2, 0.01, i * cellSize + cellSize / 2);
+                    scene.add(tileMesh);
+                } else if (tile === 2) {
+                    const tileGeometry = new THREE.PlaneGeometry(cellSize, cellSize);
+                    const tileMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                    const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
+                    tileMesh.rotation.x = -Math.PI / 2;
+                    tileMesh.position.set(j * cellSize + cellSize / 2, 0.01, i * cellSize + cellSize / 2);
+                    scene.add(tileMesh);
+                }
+            });
+        });
+    });
+
+    const torusGeometry = new THREE.TorusGeometry(2, 1, 16, 100);
+    const torusMaterial = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.5 });
+    const torusMesh = new THREE.Mesh(torusGeometry, torusMaterial);
+    torusMesh.position.set(15, 1, 15);
+    torusMesh.castShadow = true;
+    torusMesh.receiveShadow = true;
+    scene.add(torusMesh);
+
+    const pyramidGeometry = new THREE.ConeGeometry(2, 4, 4);
+    const pyramidMaterial = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.5 });
+    const pyramidMesh = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
+    pyramidMesh.position.set(35, 2, 35);
+    pyramidMesh.castShadow = true;
+    pyramidMesh.receiveShadow = true;
+    scene.add(pyramidMesh);
+
+    // Rear view mirror (fixed orientation, top with border)
+    const mirrorWidth = window.innerWidth * 0.025;
+    const mirrorHeight = mirrorWidth / 4;
+    const mirrorCamera = new THREE.PerspectiveCamera(75, mirrorWidth / mirrorHeight, 0.1, 1000);
+    const mirrorTexture = new THREE.WebGLRenderTarget(mirrorWidth * 4, mirrorHeight * 4);
+    const mirrorGeometry = new THREE.PlaneGeometry(mirrorWidth / 90, mirrorHeight / 90); // Slightly larger for border
+    const mirrorMaterial = new THREE.MeshBasicMaterial({ map: mirrorTexture.texture });
+    const mirrorMesh = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
+    mirrorMesh.position.set(0, 0.49, -1); // Very top of screen
+    camera.add(mirrorMesh);
+    // Border
+    const borderGeometry = new THREE.PlaneGeometry(mirrorWidth / 85, mirrorHeight / 85);
+    const borderMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const borderMesh = new THREE.Mesh(borderGeometry, borderMaterial);
+    borderMesh.position.set(0, 0.49, -1.01); // Slightly behind mirror
+    camera.add(borderMesh);
+    scene.add(camera);
+
+    let playerHeadTexture, enzoHeadTexture, happEnzoTexture;
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let ambientSound, gameOverSound, hugSound;
+    const ambientBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 10, audioContext.sampleRate);
+    for (let channel = 0; channel < 2; channel++) {
+        const data = ambientBuffer.getChannelData(channel);
+        for (let i = 0; i < data.length; i++) {
+            data[i] = (Math.random() - 0.5) * 0.05;
+        }
+    }
+    ambientSound = audioContext.createBufferSource();
+    ambientSound.buffer = ambientBuffer;
+    ambientSound.loop = true;
+    const ambientGain = audioContext.createGain();
+    ambientGain.gain.value = 0.1;
+    ambientSound.connect(ambientGain);
+    ambientGain.connect(audioContext.destination);
+    document.addEventListener('click', () => {
+        if (audioContext.state === 'suspended') audioContext.resume();
+        ambientSound.start();
+    }, { once: true });
+
+    gameOverSound = new Audio('fuck-you-pay-me.mp3');
+    gameOverSound.preload = 'auto';
+    hugSound = new Audio('hug.mp3');
+    hugSound.preload = 'auto';
+
+    function setupGame() {
+        const playerGroup = new THREE.Group();
+        const playerBodyGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1.5, 16);
+        const playerBodyMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
+        const playerBodyMesh = new THREE.Mesh(playerBodyGeometry, playerBodyMaterial);
+        playerBodyMesh.position.set(0, 0.75, 0);
+        playerBodyMesh.castShadow = true;
+        playerGroup.add(playerBodyMesh);
+        const playerHeadGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const playerHeadMaterial = new THREE.MeshStandardMaterial({ map: playerHeadTexture || new THREE.Texture(), roughness: 0.5 });
+        const playerHeadMesh = new THREE.Mesh(playerHeadGeometry, playerHeadMaterial);
+        playerHeadMesh.position.set(0, 1.75, 0);
+        playerHeadMesh.castShadow = true;
+        playerGroup.add(playerHeadMesh);
+        const armGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 16);
+        const armMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
+        const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+        leftArm.position.set(-0.5, 1.25, 0);
+        leftArm.castShadow = true;
+        playerGroup.add(leftArm);
+        const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+        rightArm.position.set(0.5, 1.25, 0);
+        rightArm.castShadow = true;
+        playerGroup.add(rightArm);
+        const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 16);
+        const legMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5 });
+        const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+        leftLeg.position.set(-0.3, 0.25, 0);
+        leftLeg.castShadow = true;
+        playerGroup.add(leftLeg);
+        const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+        rightLeg.position.set(0.3, 0.25, 0);
+        rightLeg.castShadow = true;
+        playerGroup.add(rightLeg);
+        scene.add(playerGroup);
+        playerGroup.visible = false;
+
+        const playerBody = new CANNON.Body({
+            mass: 1,
+            shape: new CANNON.Cylinder(0.5, 0.5, 2, 16),
+        });
+        playerBody.position.set(10, 1, 10);
+        world.addBody(playerBody);
+
+        const enzoGroup = new THREE.Group();
+        const enzoBodyGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1, 16);
+        const enzoBodyMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
+        const enzoBodyMesh = new THREE.Mesh(enzoBodyGeometry, enzoBodyMaterial);
+        enzoBodyMesh.position.set(0, 1.5, 0);
+        enzoBodyMesh.castShadow = true;
+        enzoGroup.add(enzoBodyMesh);
+        const enzoHeadGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const enzoHeadMaterial = new THREE.MeshStandardMaterial({ map: enzoHeadTexture || new THREE.Texture(), roughness: 0.5 });
+        const enzoHeadMesh = new THREE.Mesh(enzoHeadGeometry, enzoHeadMaterial);
+        enzoHeadMesh.position.set(0, 2.5, 0);
+        enzoHeadMesh.castShadow = true;
+        enzoGroup.add(enzoHeadMesh);
+        const enzoArmGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16);
+        const enzoArmMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
+        const enzoLeftArm = new THREE.Mesh(enzoArmGeometry, enzoArmMaterial);
+        enzoLeftArm.position.set(-0.6, 1.5, 0);
+        enzoLeftArm.rotation.z = Math.PI / 4;
+        enzoLeftArm.castShadow = true;
+        enzoGroup.add(enzoLeftArm);
+        const enzoRightArm = new THREE.Mesh(enzoArmGeometry, enzoArmMaterial);
+        enzoRightArm.position.set(0.6, 1.5, 0);
+        enzoRightArm.rotation.z = -Math.PI / 4;
+        enzoRightArm.castShadow = true;
+        enzoGroup.add(enzoRightArm);
+        const knifeGeometry = new THREE.BoxGeometry(0.1, 1.5, 0.05);
+        const knifeMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.8, roughness: 0.2 });
+        const knifeMesh = new THREE.Mesh(knifeGeometry, knifeMaterial);
+        knifeMesh.position.set(0, 0.75, 0);
+        knifeMesh.rotation.x = Math.PI / 2;
+        knifeMesh.castShadow = true;
+        enzoRightArm.add(knifeMesh);
+        const knifeTipGeometry = new THREE.BoxGeometry(0.1, 0.2, 0.05);
+        const knifeTipMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+        const knifeTipMesh = new THREE.Mesh(knifeTipGeometry, knifeTipMaterial);
+        knifeTipMesh.position.set(0, 0.85, 0);
+        knifeTipMesh.castShadow = true;
+        enzoRightArm.add(knifeTipMesh);
+        const bloodGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+        const bloodMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const bloodMesh = new THREE.Mesh(bloodGeometry, bloodMaterial);
+        bloodMesh.position.set(0, 0.85, 0);
+        bloodMesh.visible = false;
+        enzoRightArm.add(bloodMesh);
+        const splatterGeometry = new THREE.CircleGeometry(0.2, 16);
+        const splatterMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const splatterMesh = new THREE.Mesh(splatterGeometry, splatterMaterial);
+        splatterMesh.rotation.x = -Math.PI / 2;
+        splatterMesh.visible = false;
+        scene.add(splatterMesh);
+        const enzoLegGeometry = new THREE.CylinderGeometry(0.15, 0.15, 2, 16);
+        const enzoLegMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5 });
+        const enzoLeftLeg = new THREE.Mesh(enzoLegGeometry, enzoLegMaterial);
+        enzoLeftLeg.position.set(-0.3, 0.5, 0);
+        enzoLeftLeg.castShadow = true;
+        enzoGroup.add(enzoLeftLeg);
+        const enzoRightLeg = new THREE.Mesh(enzoLegGeometry, enzoLegMaterial);
+        enzoRightLeg.position.set(0.3, 0.5, 0);
+        enzoRightLeg.castShadow = true;
+        enzoGroup.add(enzoRightLeg);
+        scene.add(enzoGroup);
+
+        const enzoBody = new CANNON.Body({
+            mass: 1,
+            shape: new CANNON.Cylinder(0.5, 0.5, 3, 16),
+        });
+        enzoBody.position.set(80, 1.5, 80);
+        world.addBody(enzoBody);
+
+        // Triple hugs, away from walls
+        const hugs = [];
+        const hugPositions = [
+            { x: 25, z: 25 }, { x: 45, z: 45 }, { x: 65, z: 65 }, // Original
+            { x: 15, z: 15 }, { x: 35, z: 35 }, { x: 55, z: 55 }, // Additional
+            { x: 25, z: 75 }, { x: 75, z: 25 }, { x: 45, z: 15 }  // More spread out
+        ];
+        hugPositions.forEach(pos => {
+            const hugGroup = new THREE.Group();
+            const hugBodyGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1, 16);
+            const hugBodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5 });
+            const hugBodyMesh = new THREE.Mesh(hugBodyGeometry, hugBodyMaterial);
+            hugBodyMesh.position.set(0, 1.5, 0);
+            hugBodyMesh.castShadow = true;
+            hugGroup.add(hugBodyMesh);
+            const hugHeadGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const hugHeadMaterial = new THREE.MeshStandardMaterial({ map: happEnzoTexture || new THREE.Texture(), roughness: 0.5 });
+            const hugHeadMesh = new THREE.Mesh(hugHeadGeometry, hugHeadMaterial);
+            hugHeadMesh.position.set(0, 2.5, 0);
+            hugHeadMesh.castShadow = true;
+            hugGroup.add(hugHeadMesh);
+            const hugArmGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 16);
+            const hugArmMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5 });
+            const hugLeftArm = new THREE.Mesh(hugArmGeometry, hugArmMaterial);
+            hugLeftArm.position.set(-0.6, 1.5, 0);
+            hugLeftArm.castShadow = true;
+            hugGroup.add(hugLeftArm);
+            const hugRightArm = new THREE.Mesh(hugArmGeometry, hugArmMaterial);
+            hugRightArm.position.set(0.6, 1.5, 0);
+            hugRightArm.castShadow = true;
+            hugGroup.add(hugRightArm);
+            const hugLegGeometry = new THREE.CylinderGeometry(0.15, 0.15, 2, 16);
+            const hugLegMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.5 });
+            const hugLeftLeg = new THREE.Mesh(hugLegGeometry, hugLegMaterial);
+            hugLeftLeg.position.set(-0.3, 0.5, 0);
+            hugLeftLeg.castShadow = true;
+            hugGroup.add(hugLeftLeg);
+            const hugRightLeg = new THREE.Mesh(hugLegGeometry, hugLegMaterial);
+            hugRightLeg.position.set(0.3, 0.5, 0);
+            hugRightLeg.castShadow = true;
+            hugGroup.add(hugRightLeg);
+            hugGroup.position.set(pos.x, 1.5, pos.z);
+            scene.add(hugGroup);
+            hugs.push({ group: hugGroup, collected: false, leftArm: hugLeftArm, rightArm: hugRightArm, leftLeg: hugLeftLeg, rightLeg: hugRightLeg });
+        });
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesMaterial = new THREE.PointsMaterial({ color: 0xffff00, size: 0.1 });
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        const keys = new Set();
+        document.addEventListener('keydown', (event) => keys.add(event.key.toLowerCase()));
+        document.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase()));
+
+        document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock;
+        document.addEventListener('click', () => document.body.requestPointerLock());
+        let yaw = 0, pitch = 0;
+        const sensitivity = 0.002;
+        document.addEventListener('mousemove', (event) => {
+            if (document.pointerLockElement === document.body || document.mozPointerLockElement === document.body) {
+                yaw -= event.movementX * sensitivity;
+                pitch -= event.movementY * sensitivity;
+                pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
+            }
+        });
+
+        let numHugsCollected = 0;
+        let speedMultiplier = 1;
+        let effectTimer = 0;
+        let lastTile = 0;
+        let time = 0;
+        let bloodDripTimer = 0;
+        let gameOver = false;
+        let enzoSpeedMultiplier = 1; // New multiplier for Enzo's speed
+
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const restartButton = document.getElementById('restartButton');
+        const hugOverlay = document.getElementById('hugOverlay');
+        restartButton.addEventListener('click', () => {
+            gameOverSound.pause();
+            gameOverSound.currentTime = 0;
+            gameOverScreen.style.display = 'none';
+            gameOver = false;
+            playerBody.position.set(10, 1, 10);
+            enzoBody.position.set(80, 1.5, 80);
+            numHugsCollected = 0;
+            enzoSpeedMultiplier = 1;
+            speedMultiplier = 1;
+            hugOverlay.textContent = `Hugs: ${numHugsCollected}`;
+            hugs.forEach(hug => {
+                if (hug.collected) {
+                    hug.collected = false;
+                    scene.add(hug.group);
+                }
+            });
+        });
+
+        playerBody.addEventListener('collide', (event) => {
+            if (event.body === enzoBody && !gameOver) {
+                gameOver = true;
+                gameOverSound.play();
+                gameOverScreen.style.display = 'flex';
+            }
+        });
+
+        function animate() {
+            if (gameOver) return;
+            requestAnimationFrame(animate);
+
+            time = performance.now() / 1000;
+
+            const i = Math.floor(playerGroup.position.z / cellSize);
+            const j = Math.floor(playerGroup.position.x / cellSize);
+            if (i >= 0 && i < 10 && j >= 0 && j < 10 && tiles[i][j] !== 0) {
+                if (tiles[i][j] !== lastTile || effectTimer <= 0) {
+                    lastTile = tiles[i][j];
+                    speedMultiplier = (lastTile === 1) ? 0.5 : 1.5;
+                    effectTimer = 2;
+                    tileSound();
+                }
+            }
+            if (effectTimer > 0) {
+                effectTimer -= 1 / 60;
+                if (effectTimer <= 0) {
+                    speedMultiplier = 1;
+                    lastTile = 0;
+                }
+            }
+
+            const baseSpeed = 5;
+            const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+            const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+            const playerVelocity = new CANNON.Vec3();
+            if (keys.has('w')) playerVelocity.vadd(forward.multiplyScalar(baseSpeed * speedMultiplier), playerVelocity);
+            if (keys.has('s')) playerVelocity.vadd(forward.multiplyScalar(-baseSpeed * speedMultiplier), playerVelocity);
+            if (keys.has('d')) playerVelocity.vadd(right.multiplyScalar(baseSpeed * speedMultiplier), playerVelocity);
+            if (keys.has('a')) playerVelocity.vadd(right.multiplyScalar(-baseSpeed * speedMultiplier), playerVelocity);
+            playerVelocity.y = playerBody.velocity.y;
+            playerBody.velocity.copy(playerVelocity);
+
+            world.step(1 / 60);
+
+            playerGroup.position.copy(playerBody.position);
+            playerGroup.quaternion.copy(playerBody.quaternion);
+
+            const playerSpeed = Math.max(0, playerVelocity.length() / baseSpeed);
+            const zVelocity = playerVelocity.z / baseSpeed;
+            const xVelocity = playerVelocity.x / baseSpeed;
+            leftLeg.rotation.z = Math.sin(time * 8 + Math.PI) * 0.7 * playerSpeed * Math.sign(zVelocity);
+            rightLeg.rotation.z = Math.sin(time * 8) * 0.7 * playerSpeed * Math.sign(zVelocity);
+            playerGroup.position.y = 1 + Math.sin(time * 8) * 0.1 * Math.abs(zVelocity);
+            leftArm.rotation.z = Math.sin(time * 8) * 0.5 * playerSpeed * (Math.abs(zVelocity) + 0.3 * Math.abs(xVelocity));
+            rightArm.rotation.z = Math.sin(time * 8 + Math.PI) * 0.5 * playerSpeed * (Math.abs(zVelocity) + 0.3 * Math.abs(xVelocity));
+
+            const enzoDirection = playerBody.position.vsub(enzoBody.position);
+            if (enzoDirection.length() > 0) {
+                enzoDirection.normalize();
+                const enzoBaseSpeed = 2 * enzoSpeedMultiplier; // 10% faster per hug
+                const enzoVelocity = enzoDirection.scale(enzoBaseSpeed);
+                enzoVelocity.y = 0;
+                enzoBody.velocity.copy(enzoVelocity);
+
+                enzoGroup.position.copy(enzoBody.position);
+
+                const direction2D = new THREE.Vector3(enzoDirection.x, 0, enzoDirection.z).normalize();
+                const angle = Math.atan2(direction2D.x, direction2D.z);
+                enzoGroup.rotation.set(0, angle, 0);
+
+                enzoHeadMesh.lookAt(playerGroup.position);
+                enzoHeadMesh.rotation.x = 0;
+                enzoHeadMesh.rotation.z = 0;
+
+                const enzoSpeedFactor = Math.min(enzoVelocity.length() / baseSpeed, 1);
+                const runCycle = Math.sin(time * 8 * enzoSpeedFactor) * enzoSpeedFactor;
+                enzoLeftLeg.rotation.x = runCycle * 0.8;
+                enzoRightLeg.rotation.x = -runCycle * 0.8;
+                enzoLeftArm.rotation.x = -runCycle * 0.6;
+                enzoRightArm.rotation.x = runCycle * 0.3;
+                enzoBodyMesh.rotation.x = runCycle * 0.1;
+                enzoGroup.position.y = enzoBody.position.y + Math.abs(runCycle) * 0.15;
+
+                bloodDripTimer += 1 / 60;
+                if (bloodDripTimer >= 1) {
+                    bloodMesh.visible = true;
+                    bloodMesh.position.set(
+                        (Math.random() - 0.5) * 0.05,
+                        0.85,
+                        (Math.random() - 0.5) * 0.05
+                    );
+                }
+                if (bloodMesh.visible) {
+                    bloodMesh.position.y -= 0.15 * (1 + Math.random() * 0.5);
+                    if (bloodMesh.position.y < enzoGroup.position.y - 1.5) {
+                        splatterMesh.position.set(
+                            enzoGroup.position.x + bloodMesh.position.x,
+                            0.01,
+                            enzoGroup.position.z + bloodMesh.position.z
+                        );
+                        splatterMesh.scale.setScalar(0.5 + Math.random() * 0.5);
+                        splatterMesh.visible = true;
+                        bloodMesh.visible = false;
+                        bloodDripTimer = 0;
+                        setTimeout(() => splatterMesh.visible = false, 500);
+                    }
+                }
+            }
+
+            hugs.forEach(hug => {
+                if (!hug.collected) {
+                    const jumpCycle = Math.sin(time * 4);
+                    hug.leftArm.rotation.z = Math.PI / 4 + jumpCycle * 0.5;
+                    hug.rightArm.rotation.z = -Math.PI / 4 - jumpCycle * 0.5;
+                    hug.leftLeg.rotation.x = jumpCycle * 0.3;
+                    hug.rightLeg.rotation.x = -jumpCycle * 0.3;
+                    hug.group.position.y = 1.5 + Math.abs(jumpCycle) * 0.2;
+                }
+            });
+
+            hugs.forEach(hug => {
+                if (!hug.collected && playerGroup.position.distanceTo(hug.group.position) < 1.5) {
+                    hug.collected = true;
+                    scene.remove(hug.group);
+                    numHugsCollected++;
+                    enzoSpeedMultiplier *= 1.1; // 10% speed increase
+                    hugSound.play();
+                    hugOverlay.textContent = `Hugs: ${numHugsCollected}`;
+                    const particlesPositions = new Float32Array(50 * 3);
+                    for (let i = 0; i < 50; i++) {
+                        particlesPositions[i * 3] = hug.group.position.x + (Math.random() - 0.5) * 1;
+                        particlesPositions[i * 3 + 1] = hug.group.position.y + (Math.random() - 0.5) * 1;
+                        particlesPositions[i * 3 + 2] = hug.group.position.z + (Math.random() - 0.5) * 1;
+                    }
+                    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlesPositions, 3));
+                    setTimeout(() => particlesGeometry.dispose(), 500);
+                }
+            });
+
+            camera.position.set(playerGroup.position.x, playerGroup.position.y + 1.75, playerGroup.position.z);
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = yaw;
+            camera.rotation.x = pitch;
+
+            // Fixed mirror orientation
+            mirrorCamera.position.copy(camera.position);
+            mirrorCamera.rotation.order = 'YXZ';
+            mirrorCamera.rotation.y = yaw + Math.PI; // Straight behind
+            mirrorCamera.rotation.x = pitch; // Same pitch as forward view, no inversion
+            renderer.setRenderTarget(mirrorTexture);
+            renderer.render(scene, mirrorCamera);
+            renderer.setRenderTarget(null);
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    }
+
+    textureLoader.load('stoned_chuck.png', (texture) => {
+        playerHeadTexture = texture;
+        textureLoader.load('angry_enzo.png', (texture) => {
+            enzoHeadTexture = texture;
+            textureLoader.load('happ_enzo.png', (texture) => {
+                happEnzoTexture = texture;
+                setupGame();
+            }, undefined, (error) => {
+                console.error('Failed to load happ_enzo.png:', error);
+                happEnzoTexture = new THREE.Texture();
+                setupGame();
+            });
+        }, undefined, (error) => {
+            console.error('Failed to load angry_enzo.png:', error);
+            enzoHeadTexture = new THREE.Texture();
+            setupGame();
+        });
+    }, undefined, (error) => {
+        console.error('Failed to load stoned_chuck.png:', error);
+        playerHeadTexture = new THREE.Texture();
+        setupGame();
+    });
+</script>
+</body>
+</html>
