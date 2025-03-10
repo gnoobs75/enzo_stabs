@@ -73,8 +73,8 @@
             margin-bottom: 20px;
         }
         #startMenu img.firey {
-            width: 150px; /* Increased from 50px */
-            height: 150px; /* Increased from 50px */
+            width: 450px; /* Tripled from 150px */
+            height: 450px; /* Tripled from 150px */
             position: absolute;
             bottom: 20px;
         }
@@ -251,7 +251,7 @@
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    const torchLight = new THREE.PointLight(0xffaa00, 1.5, 20);
+    const torchLight = new THREE.PointLight(0xffaa00, 0.8, 10); // Reduced intensity and distance
     torchLight.castShadow = true;
     scene.add(torchLight);
 
@@ -375,14 +375,15 @@
                         wallMesh.receiveShadow = true;
                         scene.add(wallMesh);
 
-                        if (Math.random() < 0.2 && posterTextures.length > 0) {
+                        // Increase poster spawn chance to 0.5 for testing, offset from wall to avoid z-fighting
+                        if (Math.random() < 0.5 && posterTextures.length > 0) {
                             const posterGeometry = new THREE.PlaneGeometry(2, 3);
                             const posterTexture = posterTextures[Math.floor(Math.random() * posterTextures.length)];
-                            const posterMaterial = new THREE.MeshBasicMaterial({ map: posterTexture });
+                            const posterMaterial = new THREE.MeshBasicMaterial({ map: posterTexture, transparent: true });
                             const posterMesh = new THREE.Mesh(posterGeometry, posterMaterial);
 
                             const face = Math.floor(Math.random() * 4);
-                            const offset = cellSize / 2 - 0.1;
+                            const offset = cellSize / 2 + 0.1; // Slightly offset from wall surface
                             const yPos = Math.random() * (height - 3) + 1.5;
 
                             switch (face) {
@@ -608,28 +609,26 @@
         return nextWp;
     }
 
-    function computeSteering(enzoPos, targetPos) {
-        const desired = new THREE.Vector3(targetPos.x - enzoPos.x, 0, targetPos.z - enzoPos.z);
-        const distance = desired.length();
-        desired.normalize();
-
-        const ahead = new THREE.Vector3(enzoPos.x, 0, enzoPos.z).add(desired.clone().multiplyScalar(5));
+    function computeEnzoDirection(enzoPos, targetPos) {
+        const direction = new THREE.Vector3(targetPos.x - enzoPos.x, 0, targetPos.z - enzoPos.z).normalize();
         let avoidance = new THREE.Vector3(0, 0, 0);
+
+        // Check nearby walls and adjust direction
         map.forEach((row, i) => {
             row.forEach((cell, j) => {
                 if (cell === 1) {
                     const wallPos = new THREE.Vector3(j * cellSize + cellSize / 2, 0, i * cellSize + cellSize / 2);
-                    const toWall = new THREE.Vector3(wallPos.x - ahead.x, 0, wallPos.z - ahead.z);
+                    const toWall = new THREE.Vector3(wallPos.x - enzoPos.x, 0, wallPos.z - enzoPos.z);
                     const distToWall = toWall.length();
-                    if (distToWall < 3) {
+                    if (distToWall < 5) { // Increased detection range for smoother avoidance
                         toWall.normalize();
-                        avoidance.sub(toWall.multiplyScalar((3 - distToWall) / 3));
+                        avoidance.sub(toWall.multiplyScalar((5 - distToWall) / 5));
                     }
                 }
             });
         });
 
-        return desired.add(avoidance).normalize();
+        return direction.add(avoidance).normalize();
     }
 
     function preventWallClipping(pos) {
@@ -998,7 +997,7 @@
             scene.fog.far = 50 + Math.cos(time * 0.5) * 5;
 
             torchLight.position.set(roninGroup.position.x, roninGroup.position.y + 2, roninGroup.position.z);
-            torchLight.intensity = 1.5 + Math.sin(time * 5) * 0.5;
+            torchLight.intensity = 0.8 + Math.sin(time * 5) * 0.2; // Updated torch light intensity
 
             const i = Math.floor(roninGroup.position.z / cellSize);
             const j = Math.floor(roninGroup.position.x / cellSize);
@@ -1088,8 +1087,7 @@
             roninGroup.position.y = 1 + Math.abs(runCycle) * 0.15;
 
             const distanceToRonin = Math.hypot(roninBody.position.x - enzoBody.position.x, roninBody.position.z - enzoBody.position.z);
-            const enzoSpeed = enzoBaseSpeed;
-            let target;
+            let enzoSpeed = enzoBaseSpeed; // Declare enzoSpeed once
 
             if (distanceToRonin < 10) {
                 if (heartbeatSound.paused) playSound(heartbeatSound);
@@ -1097,24 +1095,25 @@
                 stopSound(heartbeatSound);
             }
 
-            if (numHugsCollected >= 3) {
-                teleportTimer -= 1 / 60;
-                if (distanceToRonin > 20 && teleportTimer <= 0 && Math.random() < 0.005) {
-                    const teleportTarget = findValidTeleport({ x: roninBody.position.x, z: roninBody.position.z }, 12);
-                    enzoBody.position.set(teleportTarget.x, 0.75, teleportTarget.z);
-                    teleportTimer = 5;
-                }
+            // Updated teleport logic: Teleport every 3rd hug to 20-30 units from Ronin
+            if (numHugsCollected >= 3 && numHugsCollected % 3 === 0 && teleportTimer <= 0) {
+                const teleportTarget = findValidTeleport({ x: roninBody.position.x, z: roninBody.position.z }, 20);
+                enzoBody.position.set(teleportTarget.x, 0.75, teleportTarget.z);
+                teleportTimer = 1; // Short cooldown to prevent rapid teleports
+                playSound(wrathSound);
+                alertOverlay.style.top = '50%';
+                alertOverlay.style.display = 'block';
+                setTimeout(() => {
+                    alertOverlay.style.top = '-50%';
+                }, 50);
+                alertTimer = 3;
             }
+            teleportTimer -= 1 / 60;
 
-            if (distanceToRonin < 10) {
-                target = { x: roninBody.position.x, z: roninBody.position.z };
-            } else {
-                target = getNextWaypoint(enzoBody.position, roninBody.position);
-            }
-
-            const direction = computeSteering(enzoBody.position, target);
-            enzoBody.position.x += direction.x * enzoSpeed * (1 / 60);
-            enzoBody.position.z += direction.z * enzoSpeed * (1 / 60);
+            // Updated Enzo movement using computeEnzoDirection
+            const enzoDirection = computeEnzoDirection(enzoBody.position, { x: roninBody.position.x, z: roninBody.position.z });
+            enzoBody.position.x += enzoDirection.x * enzoSpeed * (1 / 60);
+            enzoBody.position.z += enzoDirection.z * enzoSpeed * (1 / 60);
             enzoBody.position = preventWallClipping(enzoBody.position);
             enzoBody.position.x = Math.max(0, Math.min(200, enzoBody.position.x));
             enzoBody.position.z = Math.max(0, Math.min(200, enzoBody.position.z));
@@ -1236,7 +1235,12 @@
                     }
                     hugOverlay.children[2].textContent = `Hugs: ${numHugsCollected}`;
                     if (numHugsCollected >= 3) achievementSticker.style.display = 'inline';
-                    if (numHugsCollected >= 10) fireyBadge.style.display = 'inline';
+                    if (numHugsCollected === 10) {
+                        fireyBadge.style.display = 'inline'; // Ensure initial badge shows
+                        fireyBadge.style.width = '100px'; // Larger size
+                        fireyBadge.style.height = '100px';
+                        spawnFireyBadges(); // Spawn multiple animated badges
+                    }
                     if (numHugsCollected >= 3 && numHugsCollected % 3 === 0) {
                         const newBadge = document.createElement('img');
                         newBadge.src = 'stoned_dog.png';
@@ -1319,6 +1323,32 @@
         playerHeadTexture = new THREE.Texture();
         setupGame();
     });
+    function spawnFireyBadges() {
+        const badgeCount = 10;
+        for (let i = 0; i < badgeCount; i++) {
+            const badge = document.createElement('img');
+            badge.src = 'firey.gif';
+            badge.style.position = 'absolute';
+            badge.style.width = '100px'; // Larger size
+            badge.style.height = '100px';
+            badge.style.zIndex = '10';
+            badge.style.left = `${Math.random() * (window.innerWidth - 100)}px`;
+            badge.style.top = `${Math.random() * (window.innerHeight - 100)}px`;
+            document.body.appendChild(badge);
+
+            // Animate floating away
+            let floatTime = 0;
+            const floatInterval = setInterval(() => {
+                floatTime += 1 / 60;
+                badge.style.top = `${parseFloat(badge.style.top) - 50 * (1 / 60)}px`; // Float upward
+                badge.style.opacity = 1 - floatTime / 3; // Fade out over 3 seconds
+                if (floatTime >= 3) {
+                    clearInterval(floatInterval);
+                    document.body.removeChild(badge);
+                }
+            }, 1000 / 60);
+        }
+    }
 </script>
 </body>
 </html>
