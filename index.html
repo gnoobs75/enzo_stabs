@@ -458,20 +458,19 @@
     pyramidMesh.receiveShadow = true;
     scene.add(pyramidMesh);
 
-    // Rearview Mirror Setup (Resized to 1/4 of original size)
-    const mirrorWidth = window.innerWidth * 0.025; // 1/4 of 0.1 = 2.5% of screen width
-    const mirrorHeight = mirrorWidth / 2;
+    const mirrorWidth = window.innerWidth * 0.025;
+    const mirrorHeight = mirrorWidth / 4;
     const mirrorCamera = new THREE.PerspectiveCamera(75, mirrorWidth / mirrorHeight, 0.1, 1000);
     const mirrorTexture = new THREE.WebGLRenderTarget(mirrorWidth * 4, mirrorHeight * 4);
-    const mirrorGeometry = new THREE.PlaneGeometry(mirrorWidth / 45, mirrorHeight / 45);
+    const mirrorGeometry = new THREE.PlaneGeometry(mirrorWidth / 90, mirrorHeight / 90);
     const mirrorMaterial = new THREE.MeshBasicMaterial({ map: mirrorTexture.texture });
     const mirrorMesh = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
-    mirrorMesh.position.set(0, 0.95, -1); // Adjusted for top alignment
+    mirrorMesh.position.set(0, 0.55, -1);
     camera.add(mirrorMesh);
-    const borderGeometry = new THREE.PlaneGeometry(mirrorWidth / 40, mirrorHeight / 40);
+    const borderGeometry = new THREE.PlaneGeometry(mirrorWidth / 85, mirrorHeight / 85);
     const borderMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
     const borderMesh = new THREE.Mesh(borderGeometry, borderMaterial);
-    borderMesh.position.set(0, 0.95, -1.01); // Match mirror position
+    borderMesh.position.set(0, 0.55, -1.01);
     camera.add(borderMesh);
     scene.add(camera);
 
